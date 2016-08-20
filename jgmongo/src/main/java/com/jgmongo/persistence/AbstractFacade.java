@@ -5,7 +5,10 @@
  */
 package com.jgmongo.persistence;
 
+import com.jgmongo.anotaciones.Id;
 
+import com.jgmongo.anotaciones.PrimaryKey;
+import com.jgmongo.util.Util;
 import com.mongodb.Block;
 import com.mongodb.CursorType;
 import com.mongodb.Function;
@@ -30,6 +33,9 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import static com.mongodb.client.model.Indexes.ascending;
 import static com.mongodb.client.model.Indexes.descending;
+import com.mongodb.client.result.UpdateResult;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 
 /**
  *
@@ -41,7 +47,9 @@ public abstract class AbstractFacade<T> {
     private String database;
     private String collection;
     List<T> list = new ArrayList<>();
+    List<PrimaryKey> primaryKeyList = new ArrayList<>();
     Exception exception;
+    Util util = new Util();
 
     public Exception getException() {
         return exception;
@@ -50,7 +58,7 @@ public abstract class AbstractFacade<T> {
     public void setException(Exception exception) {
         this.exception = exception;
     }
-    
+
     T t1;
 
     protected abstract MongoClient getMongoClient();
@@ -61,7 +69,50 @@ public abstract class AbstractFacade<T> {
         this.entityClass = entityClass;
         this.database = database;
         this.collection = collection;
+        primaryKeyList = new ArrayList<>();
+/**
+ * lee las anotaciones @Id para obtener los PrimaryKey del documento
+ */
+        final Field[] variables = entityClass.getDeclaredFields();
+        for (final Field variable : variables) {
+            final Annotation anotacion = variable.getAnnotation(Id.class);
 
+            if (anotacion != null) {
+                final Id anotacionPK = (Id) anotacion;
+                PrimaryKey primaryKey = new PrimaryKey();
+//                primaryKey.setName(anotacionPK.name());
+//                primaryKey.setType(anotacionPK.type());
+                Boolean found = false;
+                for (PrimaryKey pk : primaryKeyList) {
+                    if (pk.getName().equals(primaryKey.getName())) {
+                        found = true;
+                    }
+                }
+                 variable.setAccessible(true);
+//                  System.out.println("Nombre del atributo: " + variable.getName());
+//                  System.out.println("+++++++++++++++++++++++++++++++++++++++++");
+                  primaryKey.setName(variable.getName());
+                  primaryKey.setType(variable.getType().getName());
+ 
+            // obtengo el valor del atributo
+          
+ 
+                if (!found) {
+                    primaryKeyList.add(primaryKey);
+                }
+
+//                break;
+            }
+            //Llave primary
+            if (primaryKeyList.isEmpty()) {
+
+                exception = new Exception("No have primaryKey() ");
+            }
+
+        }
+        for (PrimaryKey p : primaryKeyList) {
+            System.out.println(" " + p.toString());
+        }
     }
 
     public MongoDatabase getDB() {
@@ -71,12 +122,50 @@ public abstract class AbstractFacade<T> {
     }
 
     /**
+     *
+     * @return Document() correspondiente a la llave primaria
+     */
+    private Document getDocumentPrimaryKey(T t2) {
+        Document doc = new Document();
+        try {
+             Object t = entityClass.newInstance();
+            for (PrimaryKey p : primaryKeyList) {
+                // doc.put(p.getName(), t.getp);
+                String name = "get" + util.letterToUpper(p.getName());
+//                System.out.println("{ name: "+name+"}");
+//                System.out.println("----------------(class)> " + entityClass.getName() + "           ");
+                Method method;
+            try {
+              
+                method = entityClass.getDeclaredMethod(name);
+//                System.out.println("--->value "+method.invoke(t2));
+                    doc.put(util.letterToUpper(p.getName()), method.invoke(t2));
+
+            } catch (Exception e) {
+                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+
+                exception = new Exception("getDocumentPrimaryKey() ", e);
+            }
+                
+//           System.out.println("---->Documento primaryKey() " + doc.toString());     
+           
+            }
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "docPrimaryKey()()").log(Level.SEVERE, null, e);
+            exception = new Exception("docPrimaryKey() ", e);
+        }
+        return doc;
+    }
+
+    /**
      * save a document
      *
      * @return
      */
     public Boolean save(T t2) {
         try {
+            
+            //verify primaryKey
             Object t = entityClass.newInstance();
             Document doc = new Document();
             Method method;
@@ -86,14 +175,14 @@ public abstract class AbstractFacade<T> {
 
             } catch (Exception e) {
                 Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-         
-                exception =new Exception("saveDocument() " , e);
+
+                exception = new Exception("saveDocument() ", e);
             }
             getDB().getCollection(collection).insertOne(doc);
             return true;
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "save()").log(Level.SEVERE, null, e);
-            exception =new Exception("saveDocument() " , e);
+            exception = new Exception("saveDocument() ", e);
         }
         return false;
     }
@@ -110,7 +199,7 @@ public abstract class AbstractFacade<T> {
             return true;
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
-            exception =new Exception("remove() " , e);
+            exception = new Exception("remove() ", e);
         }
         return false;
     }
@@ -128,7 +217,7 @@ public abstract class AbstractFacade<T> {
             cont = (int) dr.getDeletedCount();
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
-            exception =new Exception("removeAll() " , e);
+            exception = new Exception("removeAll() ", e);
         }
         return cont;
     }
@@ -158,7 +247,7 @@ public abstract class AbstractFacade<T> {
                         t1 = (T) method.invoke(t, document);
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
-                        exception =new Exception("find() " , e);
+                        exception = new Exception("find() ", e);
                     }
 
                 }
@@ -166,7 +255,7 @@ public abstract class AbstractFacade<T> {
 
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-            exception =new Exception("find() " , e);
+            exception = new Exception("find() ", e);
         }
         return (T) t1;
     }
@@ -195,14 +284,14 @@ public abstract class AbstractFacade<T> {
                         t1 = (T) method.invoke(t, document);
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
-                        exception =new Exception("find() " , e);
+                        exception = new Exception("find() ", e);
                     }
                 }
             });
 
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
-            exception =new Exception("find() " , e);
+            exception = new Exception("find() ", e);
         }
         return (T) t1;
     }
@@ -227,13 +316,13 @@ public abstract class AbstractFacade<T> {
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
-                        exception =new Exception("findAll()" , e);
+                        exception = new Exception("findAll()", e);
                     }
                 }
             });
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-            exception =new Exception("findAll()" , e);
+            exception = new Exception("findAll()", e);
         }
         return list;
     }
@@ -260,15 +349,37 @@ public abstract class AbstractFacade<T> {
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
-                       exception =new Exception("findBy()" , e);
+                        exception = new Exception("findBy()", e);
                     }
                 }
             });
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-            exception =new Exception("findBy() " , e);
+            exception = new Exception("findBy() ", e);
         }
         return list;
+    }
+
+    /**
+     *
+     * @param search document to search new Document("Siglas","pa")
+     * @param update
+     * @return
+     */
+    public Integer updateOne(T t2,Document doc) {
+        Integer documentosModificados = 0;
+        Document search = new Document();
+
+        try {
+            search = getDocumentPrimaryKey(t2);
+            UpdateResult updateResult = getDB().getCollection(collection).updateOne(search, doc);
+            return (int) updateResult.getModifiedCount();
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "updateOneDocument()").log(Level.SEVERE, null, e);
+            exception = new Exception("remove() ", e);
+        }
+        return 0;
     }
 
     /**
@@ -305,13 +416,13 @@ public abstract class AbstractFacade<T> {
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
-                       exception =new Exception("findHelperSort()" , e);
+                        exception = new Exception("findHelperSort()", e);
                     }
                 }
             });
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-             exception =new Exception("findHelperSort()" , e);
+            exception = new Exception("findHelperSort()", e);
         }
         return list;
     }
@@ -352,13 +463,13 @@ public abstract class AbstractFacade<T> {
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
-                        exception =new Exception("helpers()" , e);
+                        exception = new Exception("helpers()", e);
                     }
                 }
             });
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-           exception =new Exception("helpers()" , e);
+            exception = new Exception("helpers()", e);
         }
         return list;
     }
@@ -484,13 +595,13 @@ public abstract class AbstractFacade<T> {
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "findLike()").log(Level.SEVERE, null, e);
-                       exception =new Exception("findLike()" , e);
+                        exception = new Exception("findLike()", e);
                     }
                 }
             });
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-            exception =new Exception("findLike()" , e);
+            exception = new Exception("findLike()", e);
         }
         return list;
     }
@@ -507,7 +618,7 @@ public abstract class AbstractFacade<T> {
             records = getMongoClient().getDatabase(database).getCollection(collection).count();
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "count()").log(Level.SEVERE, null, e);
-            exception =new Exception("count()" , e);
+            exception = new Exception("count()", e);
         }
 
         return (int) records;
@@ -533,13 +644,13 @@ public abstract class AbstractFacade<T> {
                         contador++;
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "count()").log(Level.SEVERE, null, e);
-                         exception =new Exception("count()" , e);
+                        exception = new Exception("count()", e);
                     }
                 }
             });
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "count()").log(Level.SEVERE, null, e);
-           exception =new Exception("count()" , e);
+            exception = new Exception("count()", e);
         }
         return contador;
     }

@@ -9,6 +9,9 @@ package com.jgmongo.services;
  *
  * @author avbravo
  */
-public class GenericBeans extends GenericServices{
+public class GenericBeans extends GenericServices {
+
+   
+
     
 }

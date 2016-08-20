@@ -13,6 +13,7 @@ import com.jgmongo.interfaces.ServicesInterfaces;
  * @param <T>
  */
 public class GenericServices<T> implements ServicesInterfaces {
+
 /**
  * 
  * @param <T>
@@ -20,7 +21,8 @@ public class GenericServices<T> implements ServicesInterfaces {
  * @param apikey
  * @param clazz
  * @return 
- */
+ */ 
+
     public <T> T fromJsonList(String url, String apikey, Class<T> clazz) {
 
      
