@@ -60,7 +60,7 @@ import org.bson.Document;
 
 public class Paises extends GenericBeans {
 
-   <h4> @Id </h4>
+    @Id  
     
     @SerializedName("Siglas")
     
@@ -78,13 +78,13 @@ public class Paises extends GenericBeans {
     
     private Continente continente;
 
-<h4>     public Document toDocument(Paises paises) { </h4>
+     public Document toDocument(Paises paises) { 
     
         return toDoc(paises);
         
     }
 
-<h4>  public Paises toPojo(Document doc) { </h4>
+  public Paises toPojo(Document doc) { 
     
         return (Paises) toJava(doc, Paises.class);
         
