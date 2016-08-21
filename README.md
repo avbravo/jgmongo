@@ -59,7 +59,7 @@ import org.bson.Document;
 @Setter
 
 public class Paises extends GenericBeans {
-<h1> @Id</h1>
+<h2>// @Id for PrimaryKey</h2>
 
     @Id
     
