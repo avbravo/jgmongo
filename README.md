@@ -77,6 +77,7 @@ public class Paises extends GenericBeans {
     @SerializedName("Continente")
     
     private Continente continente;
+    
 
      public Document toDocument(Paises paises) { 
     
@@ -84,11 +85,10 @@ public class Paises extends GenericBeans {
         
     }
 
-  public Paises toPojo(Document doc) { 
+    public Paises toPojo(Document doc) { 
     
         return (Paises) toJava(doc, Paises.class);
         
-
     }
 
     @Override
