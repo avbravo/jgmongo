@@ -5,13 +5,17 @@
  */
 package com.jgmongo.services;
 
+import static javafx.scene.input.KeyCode.T;
+import org.bson.Document;
+
 /**
  *
  * @author avbravo
+ * @param <T>
  */
-public class GenericBeans extends GenericServices {
+public class GenericBeans <T> extends GenericServices {
 
-   
+    
 
     
 }

@@ -14,13 +14,37 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import java.util.Date;
+import org.bson.Document;
 
 /**
  *
  * @author avbravo
+ * @param <T>
  */
-public interface ServicesInterfaces {
+public interface ServicesInterfaces<T> {
 
+    
+    
+    default public Document toDoc(T t) {
+        Document doc = new Document();
+        try {
+            doc = Document.parse(getGson().toJson(t));
+        } catch (Exception e) {
+            System.out.println("toDocument() " + e.getLocalizedMessage());
+        }
+        return doc;
+    } 
+    
+   default T toJava(Document doc,T t1) {
+      
+           T o=fromJsontoJava(doc.toJson(), (Class<T>) t1);
+        
+        return o;
+    }
+    default <T> T fromJsontoJava(String json, Class<T> clazz) {
+        T jsonToObject = getGson().fromJson(json, clazz);
+        return jsonToObject;
+    }
     /**
      * devuelve el json como un string
      *

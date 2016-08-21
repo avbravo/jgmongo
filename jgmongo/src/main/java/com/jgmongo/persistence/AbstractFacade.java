@@ -70,9 +70,9 @@ public abstract class AbstractFacade<T> {
         this.database = database;
         this.collection = collection;
         primaryKeyList = new ArrayList<>();
-/**
- * lee las anotaciones @Id para obtener los PrimaryKey del documento
- */
+        /**
+         * lee las anotaciones @Id para obtener los PrimaryKey del documento
+         */
         final Field[] variables = entityClass.getDeclaredFields();
         for (final Field variable : variables) {
             final Annotation anotacion = variable.getAnnotation(Id.class);
@@ -88,15 +88,13 @@ public abstract class AbstractFacade<T> {
                         found = true;
                     }
                 }
-                 variable.setAccessible(true);
+                variable.setAccessible(true);
 //                  System.out.println("Nombre del atributo: " + variable.getName());
 //                  System.out.println("+++++++++++++++++++++++++++++++++++++++++");
-                  primaryKey.setName(variable.getName());
-                  primaryKey.setType(variable.getType().getName());
- 
-            // obtengo el valor del atributo
-          
- 
+                primaryKey.setName(variable.getName());
+                primaryKey.setType(variable.getType().getName());
+
+                // obtengo el valor del atributo
                 if (!found) {
                     primaryKeyList.add(primaryKey);
                 }
@@ -128,27 +126,17 @@ public abstract class AbstractFacade<T> {
     private Document getDocumentPrimaryKey(T t2) {
         Document doc = new Document();
         try {
-             Object t = entityClass.newInstance();
+            Object t = entityClass.newInstance();
             for (PrimaryKey p : primaryKeyList) {
-                // doc.put(p.getName(), t.getp);
                 String name = "get" + util.letterToUpper(p.getName());
-//                System.out.println("{ name: "+name+"}");
-//                System.out.println("----------------(class)> " + entityClass.getName() + "           ");
                 Method method;
-            try {
-              
-                method = entityClass.getDeclaredMethod(name);
-//                System.out.println("--->value "+method.invoke(t2));
+                try {
+                    method = entityClass.getDeclaredMethod(name);
                     doc.put(util.letterToUpper(p.getName()), method.invoke(t2));
-
-            } catch (Exception e) {
-                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-
-                exception = new Exception("getDocumentPrimaryKey() ", e);
-            }
-                
-//           System.out.println("---->Documento primaryKey() " + doc.toString());     
-           
+                } catch (Exception e) {
+                    Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+                    exception = new Exception("getDocumentPrimaryKey() ", e);
+                }
             }
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "docPrimaryKey()()").log(Level.SEVERE, null, e);
@@ -164,28 +152,31 @@ public abstract class AbstractFacade<T> {
      */
     public Boolean save(T t2) {
         try {
-            
+
             //verify primaryKey
+            if (findById(t2) != null) {
+                exception = new Exception("You can not save because there is a document that id");
+                return false;
+            }
             Object t = entityClass.newInstance();
             Document doc = new Document();
             Method method;
             try {
                 method = entityClass.getDeclaredMethod("toDocument", entityClass);
                 doc = (Document) method.invoke(t, t2);
-
             } catch (Exception e) {
                 Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-
-                exception = new Exception("saveDocument() ", e);
+                exception = new Exception("save() ", e);
             }
             getDB().getCollection(collection).insertOne(doc);
             return true;
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "save()").log(Level.SEVERE, null, e);
-            exception = new Exception("saveDocument() ", e);
+            exception = new Exception("save() ", e);
         }
         return false;
     }
+    
 
     /**
      * removeDocument
@@ -220,6 +211,60 @@ public abstract class AbstractFacade<T> {
             exception = new Exception("removeAll() ", e);
         }
         return cont;
+    }
+ /**
+     *
+     * @param search document to search new Document("Siglas","pa")
+     * @param update
+     * @return
+     */
+    public Integer updateOne(T t2, Document doc) {
+        Integer documentosModificados = 0;
+        Document search = new Document();
+
+        try {
+            search = getDocumentPrimaryKey(t2);
+            UpdateResult updateResult = getDB().getCollection(collection).updateOne(search, doc);
+            return (int) updateResult.getModifiedCount();
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "updateOneDocument()").log(Level.SEVERE, null, e);
+            exception = new Exception("remove() ", e);
+        }
+        return 0;
+    }
+    /**
+     * Busca el documento por la llave primaria
+     *
+     * @return T
+     */
+    public T findById(T t2) {
+
+        try {
+            Object t = entityClass.newInstance();
+            MongoDatabase db = getMongoClient().getDatabase(database);
+            FindIterable<Document> iterable = db.getCollection(collection).find(getDocumentPrimaryKey(t2));
+            iterable.forEach(new Block<Document>() {
+                @Override
+                public void apply(final Document document) {
+
+                    Method method;
+                    try {
+                        method = entityClass.getDeclaredMethod("toPojo", Document.class);
+                        t1 = (T) method.invoke(t, document);
+                    } catch (Exception e) {
+                        Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
+                        exception = new Exception("findById() ", e);
+                    }
+
+                }
+            });
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            exception = new Exception("findById() ", e);
+        }
+        return (T) t1;
     }
 
     /**
@@ -359,27 +404,41 @@ public abstract class AbstractFacade<T> {
         }
         return list;
     }
-
-    /**
+ /**
+     * findLike Fuciona como el like "%s" en SQL
      *
-     * @param search document to search new Document("Siglas","pa")
-     * @param update
+     * @param key
+     * @param value
+     * @param docSort Document for sort
      * @return
      */
-    public Integer updateOne(T t2,Document doc) {
-        Integer documentosModificados = 0;
-        Document search = new Document();
+     public List<T> findLike(String key, String value, Document docSort) {
+        list = new ArrayList<>();
 
         try {
-            search = getDocumentPrimaryKey(t2);
-            UpdateResult updateResult = getDB().getCollection(collection).updateOne(search, doc);
-            return (int) updateResult.getModifiedCount();
 
+            Object t = entityClass.newInstance();
+            Pattern regex = Pattern.compile(value);
+
+            MongoDatabase db = getMongoClient().getDatabase(database);
+            FindIterable<Document> iterable = db.getCollection(collection).find(new Document(key, regex)).sort(docSort);
+            iterable.forEach(new Block<Document>() {
+                @Override
+                public void apply(final Document document) {
+                    try {
+                        Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
+                        list.add((T) method.invoke(t, document));
+                    } catch (Exception e) {
+                        Logger.getLogger(AbstractFacade.class.getName() + "findLike()").log(Level.SEVERE, null, e);
+                        exception = new Exception("findLike()", e);
+                    }
+                }
+            });
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "updateOneDocument()").log(Level.SEVERE, null, e);
-            exception = new Exception("remove() ", e);
+            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            exception = new Exception("findLike()", e);
         }
-        return 0;
+        return list;
     }
 
     /**
@@ -569,42 +628,8 @@ public abstract class AbstractFacade<T> {
         return iterable;
     }
 
-    /**
-     * findLike Fuciona como el like "%s" en SQL
-     *
-     * @param key
-     * @param value
-     * @param docSort Document for sort
-     * @return
-     */
-    public List<T> findLike(String key, String value, Document docSort) {
-        list = new ArrayList<>();
-
-        try {
-
-            Object t = entityClass.newInstance();
-            Pattern regex = Pattern.compile(value);
-
-            MongoDatabase db = getMongoClient().getDatabase(database);
-            FindIterable<Document> iterable = db.getCollection(collection).find(new Document(key, regex)).sort(docSort);
-            iterable.forEach(new Block<Document>() {
-                @Override
-                public void apply(final Document document) {
-                    try {
-                        Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
-                        list.add((T) method.invoke(t, document));
-                    } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "findLike()").log(Level.SEVERE, null, e);
-                        exception = new Exception("findLike()", e);
-                    }
-                }
-            });
-        } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-            exception = new Exception("findLike()", e);
-        }
-        return list;
-    }
+   
+  
 
     /**
      * cuenta todos los registros de un collection
