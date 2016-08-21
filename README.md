@@ -32,44 +32,74 @@ It works similar to JPA
 
 **2. Create beans**
 
+
 import com.google.gson.annotations.SerializedName;
+
 import com.jgmongo.anotaciones.Id;
+
 import com.jgmongo.services.GenericBeans;
+
 import lombok.Getter;
+
 import lombok.Setter;
+
 import org.bson.Document;
 
+
 /**
+
  *
+ 
  * @author avbravo
+ * 
  */
+
 @Getter
+
 @Setter
+
 public class Paises extends GenericBeans {
+<h1> @Id</h1>
 
     @Id
+    
     @SerializedName("Siglas")
+    
     private String siglas;
+    
     @SerializedName("Pais")
+    
     private String pais;
+    
     @SerializedName("Logo")
+    
     private String logo;
+    
     @SerializedName("Continente")
+    
     private Continente continente;
 
     public Document toDocument(Paises paises) {
+    
         return toDoc(paises);
+        
     }
 
     public Paises toPojo(Document doc) {
+    
         return (Paises) toJava(doc, Paises.class);
+        
 
     }
 
     @Override
+    
     public String toString() {
+    
         return "Paises{" + "siglas=" + siglas + ", pais=" + pais + '}';
+        
     }
+    
 }
 
 
