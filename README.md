@@ -26,7 +26,7 @@ It works similar to JPA
          <dependency>
 	    <groupId>com.github.avbravo</groupId>
 	    <artifactId>jgmongo</artifactId>
-	    <version>0.1</version>
+	    <version>0.2</version>
 	</dependency>
     </dependencies>
 
