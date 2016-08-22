@@ -73,33 +73,27 @@ public interface ServicesInterfaces<T> {
      *
      * @return
      */
+
 //    default Gson getGson() {
 //
 //        Gson gson = new GsonBuilder()
-//                .setPrettyPrinting()
-//                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//                .create();
+//               .setPrettyPrinting()
+//          .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+//               .create();
 //
 //        return gson;
 //    }
+
     default Gson getGson() {
 
         Gson gson = new GsonBuilder()
-               .setPrettyPrinting()
-          .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-               .create();
+                .registerTypeAdapter(Date.class, new DateDeserializer())
+                .setPrettyPrinting()
+              
+                .create();
 
         return gson;
     }
-//    default Gson getGson() {
-//
-//        Gson gson = new GsonBuilder()
-//                .setPrettyPrinting()
-//     
-//                .create();
-//
-//        return gson;
-//    }
     default Gson getGsonDate() {
 
         Gson gson = new GsonBuilder()

@@ -5,9 +5,12 @@
  */
 package com.jgmongo.persistence;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jgmongo.anotaciones.Id;
 
 import com.jgmongo.anotaciones.PrimaryKey;
+import com.jgmongo.util.DateDeserializer;
 import com.jgmongo.util.Util;
 import com.mongodb.Block;
 import com.mongodb.CursorType;
@@ -36,6 +39,7 @@ import static com.mongodb.client.model.Indexes.descending;
 import com.mongodb.client.result.UpdateResult;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Date;
 
 /**
  *
@@ -50,6 +54,27 @@ public abstract class AbstractFacade<T> {
     List<PrimaryKey> primaryKeyList = new ArrayList<>();
     Exception exception;
     Util util = new Util();
+    
+    
+//private Gson getGson() {
+//
+//        Gson gson = new GsonBuilder()
+//               .setPrettyPrinting()
+//          .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+//               .create();
+//
+//        return gson;
+//    }
+private Gson getGson() {
+
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Date.class, new DateDeserializer())
+                .setPrettyPrinting()
+              
+                .create();
+
+        return gson;
+    }
 
     public Exception getException() {
         return exception;
@@ -139,8 +164,23 @@ public abstract class AbstractFacade<T> {
                 }
             }
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "docPrimaryKey()()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade.class.getName() + "docPrimaryKey()").log(Level.SEVERE, null, e);
             exception = new Exception("docPrimaryKey() ", e);
+        }
+        return doc;
+    }
+    /***
+     * 
+     * @param t2
+     * @return 
+     */
+    private Document getDocument(T t2){
+         Document doc = new Document();
+        try {
+              doc = Document.parse(getGson().toJson(t2));
+        } catch (Exception e) {
+             Logger.getLogger(AbstractFacade.class.getName() + "getDocument()").log(Level.SEVERE, null, e);
+            exception = new Exception("getDocument ", e);
         }
         return doc;
     }
@@ -184,27 +224,39 @@ public abstract class AbstractFacade<T> {
      * @param doc
      * @return
      */
-    public Boolean remove(Document doc) {
+    public Boolean deleteOne(Document doc) {
         try {
             getDB().getCollection(collection).deleteOne(doc);
             return true;
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade.class.getName() + "remove()").log(Level.SEVERE, null, e);
             exception = new Exception("remove() ", e);
         }
         return false;
     }
+    public Integer deleteMany(Document doc) {
+           Integer cont = 0;
+        try {
+          DeleteResult dr =    getDB().getCollection(collection).deleteMany(doc);
+      cont = (int) dr.getDeletedCount();
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "deleteManye()").log(Level.SEVERE, null, e);
+            exception = new Exception("deleteMany() ", e);
+        }
+        return cont;
+    }
+    
 
     /**
      * Remove all documment of a collection
      *
      * @return count of document delete
      */
-    public Integer removeAll() {
+    public Integer deleteAll() {
         Integer cont = 0;
         try {
             DeleteResult dr = getDB().getCollection(collection).deleteMany(new Document());
-            dr.getDeletedCount();
+      
             cont = (int) dr.getDeletedCount();
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
@@ -212,13 +264,35 @@ public abstract class AbstractFacade<T> {
         }
         return cont;
     }
+   /**
+    * drop collection
+    * @return 
+    */
+    public Boolean drop() {
+      
+        try {
+          getDB().getCollection(collection).drop();
+          return true;
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
+            exception = new Exception("removeAll() ", e);
+        }
+        return false;
+    }
+    
+    
  /**
      *
      * @param search document to search new Document("Siglas","pa")
      * @param update
      * @return
      */
-    public Integer updateOne(T t2, Document doc) {
+    public Integer update(T t2){
+         return updateOne( t2,new Document("$set",getDocument(t2)));
+    }
+            
+    private Integer updateOne(T t2, Document doc) {
         Integer documentosModificados = 0;
         Document search = new Document();
 
