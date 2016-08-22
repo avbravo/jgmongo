@@ -20,6 +20,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
+import com.mongodb.client.model.Filters;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gt;
 import static com.mongodb.client.model.Filters.lt;
@@ -302,8 +303,91 @@ private Gson getGson() {
             return (int) updateResult.getModifiedCount();
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "updateOneDocument()").log(Level.SEVERE, null, e);
-            exception = new Exception("remove() ", e);
+            Logger.getLogger(AbstractFacade.class.getName() + "updateOne()").log(Level.SEVERE, null, e);
+            exception = new Exception("updateOne() ", e);
+        }
+        return 0;
+    }
+    public Integer updateOne(Document docSearch, Document docUpdate) {
+        Integer documentosModificados = 0;
+ 
+
+        try {
+           
+            UpdateResult updateResult = getDB().getCollection(collection).updateOne(docSearch, docUpdate);
+            return (int) updateResult.getModifiedCount();
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "updateOne()").log(Level.SEVERE, null, e);
+            exception = new Exception("updateOne() ", e);
+        }
+        return 0;
+    }
+    /**
+     * Actualiza multiples documentos
+     * @param docSearch
+     * @param docUpdate
+     * @return 
+     */
+    public Integer updateMany(Document docSearch, Document docUpdate) {
+        Integer documentosModificados = 0;
+ 
+
+        try {
+           
+            UpdateResult updateResult = getDB().getCollection(collection).updateMany(docSearch, docUpdate);
+            return (int) updateResult.getModifiedCount();
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "updateMany()").log(Level.SEVERE, null, e);
+            exception = new Exception("updateMany() ", e);
+        }
+        return 0;
+    }
+  /**
+   * implementa replaceOne
+   * @param key 
+   * @param value
+   * @param docUpdate
+   * @return 
+   */
+    public Integer replaceOne(String key, String value, Document docUpdate) {
+        Integer documentosModificados = 0;
+ 
+
+        try{
+            UpdateResult updateResult = getDB().getCollection(collection).replaceOne(Filters.eq(key,value), docUpdate);
+          
+            return (int) updateResult.getModifiedCount();
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "replaceOne()").log(Level.SEVERE, null, e);
+            exception = new Exception("replaceOne() ", e);
+        }
+        return 0;
+    }
+    /**
+     * 
+     * @param docSearch
+     * @param docUpdate
+     * @param options
+     * @return 
+     */
+    public Integer replaceOne(Document docSearch, Document docUpdate, String... options) {
+        Integer documentosModificados = 0;
+ 
+
+        try {
+            for (String arg : options) {
+        System.out.println(arg);
+    }
+            
+            UpdateResult updateResult = getDB().getCollection(collection).replaceOne(docSearch, docUpdate);
+            return (int) updateResult.getModifiedCount();
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "updateOne()").log(Level.SEVERE, null, e);
+            exception = new Exception("updateOne() ", e);
         }
         return 0;
     }
@@ -460,6 +544,48 @@ private Gson getGson() {
 
             MongoDatabase db = getMongoClient().getDatabase(database);
             FindIterable<Document> iterable = db.getCollection(collection).find(doc).sort(docSort);
+            iterable.forEach(new Block<Document>() {
+                @Override
+                public void apply(final Document document) {
+                    try {
+                        Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
+                        list.add((T) method.invoke(t, document));
+                    } catch (Exception e) {
+                        Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
+                        exception = new Exception("findBy()", e);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            exception = new Exception("findBy() ", e);
+        }
+        return list;
+    }
+    /**
+     * 
+     * @param filter
+     * @param docSort
+     * @return 
+     */
+    public List<T> findBy(Bson filter,Document... docSort) {
+        Document sortQuery = new Document();
+        try {
+            System.out.println("filter "+filter.toString());
+            System.out.println("length---> "+docSort.length);
+            if(docSort.length!=0){
+                sortQuery  = docSort[0]; 
+                System.out.println("orden "+sortQuery.toJson().toString());
+            }
+            
+//            Bson r1 = Filters.and(Filters.eq("a","b"), Filters.eq("c","d"));
+
+            Object t = entityClass.newInstance();
+            list = new ArrayList<>();
+
+            MongoDatabase db = getMongoClient().getDatabase(database);
+//            FindIterable<Document> iterable = db.getCollection(collection).find(eq("Pais","Cubafilter).sort(sortQuery);
+            FindIterable<Document> iterable = db.getCollection(collection).find(filter).sort(sortQuery);
             iterable.forEach(new Block<Document>() {
                 @Override
                 public void apply(final Document document) {
