@@ -368,6 +368,28 @@ private Gson getGson() {
     }
     /**
      * 
+     * @param key
+     * @param value
+     * @param docUpdate
+     * @return 
+     */
+    public Integer replaceOne(Bson search, Document docUpdate) {
+        Integer documentosModificados = 0;
+ 
+
+        try{
+            UpdateResult updateResult = getDB().getCollection(collection).replaceOne(search, docUpdate);
+          
+            return (int) updateResult.getModifiedCount();
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "replaceOne()").log(Level.SEVERE, null, e);
+            exception = new Exception("replaceOne() ", e);
+        }
+        return 0;
+    }
+    /**
+     * 
      * @param docSearch
      * @param docUpdate
      * @param options
@@ -417,7 +439,6 @@ private Gson getGson() {
 
                 }
             });
-
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findById() ", e);

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jgmongo</groupId>
     <artifactId>jgmongo</artifactId>
-    <version>0.2.1</version>
+    <version>0.3</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
@@ -58,4 +58,5 @@
 
         <finalName>${project.artifactId}</finalName>
     </build>
+    <description>Java Mapper Object for MongoDB</description>
 </project>
