@@ -106,7 +106,7 @@ public class PaisesFacade extends AbstractFacade<Paises>{
         //save document
         paisesFacade.save(paises);
         //list all document
-        List<Paises> list = paisesFacade.findAll(new Document());
+        List<Paises> list = paisesFacade.findAll();
         list.stream().forEach((p) -> {
             System.out.println(p.toString());
         });
@@ -151,10 +151,6 @@ public class PaisesFacade extends AbstractFacade<Paises> {
      MongoClientProvider mongoClientProvider;
 
 
-     List<Paises> list = new ArrayList<>();
-
-     Paises paises = new Paises();
-
    @Override
 
     protected MongoClient getMongoClient() {
@@ -192,5 +188,5 @@ public Boolean save(Paises paises){
 
 public List<Paises> getPaises(){ 
 
-      return paisesFacade.findAll(new Document());
+      return paisesFacade.findAll();
 }
