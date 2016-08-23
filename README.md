@@ -1,9 +1,8 @@
 # JGMmongo
-Java Object Mapper for Mongodb
-Welcome to the jgmongo wiki!
-Jgmongo
-Java  Object Mapper for MongoDB based in Java Driver for MongoDB, GSon
-
+Java  Object Mapper for MongoDB
+<i>
+Based in Java Driver for MongoDB and GSon
+</i>
 It works similar to JPA, 
 <a href="https://github.com/avbravo/jgmongo/wiki">visit Wiki for Documentation</a>
 # JGMongo
