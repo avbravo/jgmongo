@@ -504,13 +504,17 @@ private Gson getGson() {
      * @param docSort Document para ordenar el resultado
      * @return
      */
-    public List<T> findAll(Document docSort) {
+    public List<T> findAll(Document... docSort) {
+        Document sortQuery = new Document();
         try {
+if(docSort.length!=0){
+                sortQuery  = docSort[0]; 
 
+            }
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
             MongoDatabase db = getMongoClient().getDatabase(database);
-            FindIterable<Document> iterable = db.getCollection(collection).find().sort(docSort);
+            FindIterable<Document> iterable = db.getCollection(collection).find().sort(sortQuery);
             iterable.forEach(new Block<Document>() {
                 @Override
                 public void apply(final Document document) {
@@ -536,14 +540,18 @@ private Gson getGson() {
      * @param docSort Document of sort
      * @return
      */
-    public List<T> findBy(Document doc, Document docSort) {
+    public List<T> findBy(Document doc, Document... docSort) {
+         Document sortQuery = new Document();
         try {
+if(docSort.length!=0){
+                sortQuery  = docSort[0]; 
 
+            }
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
 
             MongoDatabase db = getMongoClient().getDatabase(database);
-            FindIterable<Document> iterable = db.getCollection(collection).find(doc).sort(docSort);
+            FindIterable<Document> iterable = db.getCollection(collection).find(doc).sort(sortQuery);
             iterable.forEach(new Block<Document>() {
                 @Override
                 public void apply(final Document document) {
@@ -571,11 +579,10 @@ private Gson getGson() {
     public List<T> findBy(Bson filter,Document... docSort) {
         Document sortQuery = new Document();
         try {
-            System.out.println("filter "+filter.toString());
-            System.out.println("length---> "+docSort.length);
+           
             if(docSort.length!=0){
                 sortQuery  = docSort[0]; 
-                System.out.println("orden "+sortQuery.toJson().toString());
+
             }
             
 //            Bson r1 = Filters.and(Filters.eq("a","b"), Filters.eq("c","d"));
@@ -612,16 +619,21 @@ private Gson getGson() {
      * @param docSort Document for sort
      * @return
      */
-     public List<T> findLike(String key, String value, Document docSort) {
+     public List<T> findLike(String key, String value, Document... docSort) {
+          Document sortQuery = new Document();
         list = new ArrayList<>();
 
         try {
 
+            if(docSort.length!=0){
+                sortQuery  = docSort[0]; 
+
+            }
             Object t = entityClass.newInstance();
             Pattern regex = Pattern.compile(value);
 
             MongoDatabase db = getMongoClient().getDatabase(database);
-            FindIterable<Document> iterable = db.getCollection(collection).find(new Document(key, regex)).sort(docSort);
+            FindIterable<Document> iterable = db.getCollection(collection).find(new Document(key, regex)).sort( sortQuery);
             iterable.forEach(new Block<Document>() {
                 @Override
                 public void apply(final Document document) {
@@ -694,9 +706,13 @@ private Gson getGson() {
      * @param docSort
      * @return
      */
-    public List<T> helpers(String predicate, String key, String value, Document docSort) {
+    public List<T> helpers(String predicate, String key, String value,Document... docSort) {
+        Document sortQuery = new Document();
         try {
+ if(docSort.length!=0){
+                sortQuery  = docSort[0]; 
 
+            }
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
 
@@ -704,13 +720,13 @@ private Gson getGson() {
             FindIterable<Document> iterable = getIterable();
             switch (predicate) {
                 case "eq":
-                    iterable = db.getCollection(collection).find(eq(key, value)).sort(docSort);
+                    iterable = db.getCollection(collection).find(eq(key, value)).sort(sortQuery);
                     break;
                 case "lt":
-                    iterable = db.getCollection(collection).find(lt(key, value)).sort(docSort);
+                    iterable = db.getCollection(collection).find(lt(key, value)).sort(sortQuery);
                     break;
                 case "gt":
-                    iterable = db.getCollection(collection).find(gt(key, value)).sort(docSort);
+                    iterable = db.getCollection(collection).find(gt(key, value)).sort(sortQuery);
                     break;
             }
 
