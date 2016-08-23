@@ -55,8 +55,7 @@ public abstract class AbstractFacade<T> {
     List<PrimaryKey> primaryKeyList = new ArrayList<>();
     Exception exception;
     Util util = new Util();
-    
-    
+
 //private Gson getGson() {
 //
 //        Gson gson = new GsonBuilder()
@@ -66,12 +65,11 @@ public abstract class AbstractFacade<T> {
 //
 //        return gson;
 //    }
-private Gson getGson() {
+    private Gson getGson() {
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(Date.class, new DateDeserializer())
                 .setPrettyPrinting()
-              
                 .create();
 
         return gson;
@@ -170,17 +168,37 @@ private Gson getGson() {
         }
         return doc;
     }
-    /***
-     * 
-     * @param t2
-     * @return 
+
+    /**
+     * Crea un Index en base a la llave primaria
+     *
+     * @return
      */
-    private Document getDocument(T t2){
-         Document doc = new Document();
+    private Document getIndexPrimaryKey() {
+        Document doc = new Document();
         try {
-              doc = Document.parse(getGson().toJson(t2));
+            for (PrimaryKey p : primaryKeyList) {
+                doc.put(util.letterToUpper(p.getName()), 1);
+            }
         } catch (Exception e) {
-             Logger.getLogger(AbstractFacade.class.getName() + "getDocument()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade.class.getName() + "docPrimaryKey()").log(Level.SEVERE, null, e);
+            exception = new Exception("docPrimaryKey() ", e);
+        }
+        return doc;
+    }
+
+    /**
+     * *
+     *
+     * @param t2
+     * @return
+     */
+    private Document getDocument(T t2) {
+        Document doc = new Document();
+        try {
+            doc = Document.parse(getGson().toJson(t2));
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "getDocument()").log(Level.SEVERE, null, e);
             exception = new Exception("getDocument ", e);
         }
         return doc;
@@ -217,7 +235,29 @@ private Gson getGson() {
         }
         return false;
     }
-    
+
+    /**
+     *
+     * @param doc
+     * @return
+     */
+    public Boolean createIndex(Document... doc) {
+        Document docIndex = new Document();
+        try {
+            if (doc.length != 0) {
+                docIndex = doc[0];
+
+            } else {
+                docIndex = getIndexPrimaryKey();
+            }
+            getDB().getCollection(collection).createIndex(docIndex);
+            return true;
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "createIndex()").log(Level.SEVERE, null, e);
+            exception = new Exception("createIndex() ", e);
+        }
+        return false;
+    }
 
     /**
      * removeDocument
@@ -235,18 +275,18 @@ private Gson getGson() {
         }
         return false;
     }
+
     public Integer deleteMany(Document doc) {
-           Integer cont = 0;
+        Integer cont = 0;
         try {
-          DeleteResult dr =    getDB().getCollection(collection).deleteMany(doc);
-      cont = (int) dr.getDeletedCount();
+            DeleteResult dr = getDB().getCollection(collection).deleteMany(doc);
+            cont = (int) dr.getDeletedCount();
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "deleteManye()").log(Level.SEVERE, null, e);
             exception = new Exception("deleteMany() ", e);
         }
         return cont;
     }
-    
 
     /**
      * Remove all documment of a collection
@@ -257,7 +297,7 @@ private Gson getGson() {
         Integer cont = 0;
         try {
             DeleteResult dr = getDB().getCollection(collection).deleteMany(new Document());
-      
+
             cont = (int) dr.getDeletedCount();
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
@@ -265,15 +305,17 @@ private Gson getGson() {
         }
         return cont;
     }
-   /**
-    * drop collection
-    * @return 
-    */
+
+    /**
+     * drop collection
+     *
+     * @return
+     */
     public Boolean drop() {
-      
+
         try {
-          getDB().getCollection(collection).drop();
-          return true;
+            getDB().getCollection(collection).drop();
+            return true;
 
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
@@ -281,18 +323,17 @@ private Gson getGson() {
         }
         return false;
     }
-    
-    
- /**
+
+    /**
      *
      * @param search document to search new Document("Siglas","pa")
      * @param update
      * @return
      */
-    public Integer update(T t2){
-         return updateOne( t2,new Document("$set",getDocument(t2)));
+    public Integer update(T t2) {
+        return updateOne(t2, new Document("$set", getDocument(t2)));
     }
-            
+
     private Integer updateOne(T t2, Document doc) {
         Integer documentosModificados = 0;
         Document search = new Document();
@@ -308,12 +349,12 @@ private Gson getGson() {
         }
         return 0;
     }
+
     public Integer updateOne(Document docSearch, Document docUpdate) {
         Integer documentosModificados = 0;
- 
 
         try {
-           
+
             UpdateResult updateResult = getDB().getCollection(collection).updateOne(docSearch, docUpdate);
             return (int) updateResult.getModifiedCount();
 
@@ -323,18 +364,19 @@ private Gson getGson() {
         }
         return 0;
     }
+
     /**
      * Actualiza multiples documentos
+     *
      * @param docSearch
      * @param docUpdate
-     * @return 
+     * @return
      */
     public Integer updateMany(Document docSearch, Document docUpdate) {
         Integer documentosModificados = 0;
- 
 
         try {
-           
+
             UpdateResult updateResult = getDB().getCollection(collection).updateMany(docSearch, docUpdate);
             return (int) updateResult.getModifiedCount();
 
@@ -344,42 +386,21 @@ private Gson getGson() {
         }
         return 0;
     }
-  /**
-   * implementa replaceOne
-   * @param key 
-   * @param value
-   * @param docUpdate
-   * @return 
-   */
-    public Integer replaceOne(String key, String value, Document docUpdate) {
-        Integer documentosModificados = 0;
- 
 
-        try{
-            UpdateResult updateResult = getDB().getCollection(collection).replaceOne(Filters.eq(key,value), docUpdate);
-          
-            return (int) updateResult.getModifiedCount();
-
-        } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "replaceOne()").log(Level.SEVERE, null, e);
-            exception = new Exception("replaceOne() ", e);
-        }
-        return 0;
-    }
     /**
-     * 
+     * implementa replaceOne
+     *
      * @param key
      * @param value
      * @param docUpdate
-     * @return 
+     * @return
      */
-    public Integer replaceOne(Bson search, Document docUpdate) {
+    public Integer replaceOne(String key, String value, Document docUpdate) {
         Integer documentosModificados = 0;
- 
 
-        try{
-            UpdateResult updateResult = getDB().getCollection(collection).replaceOne(search, docUpdate);
-          
+        try {
+            UpdateResult updateResult = getDB().getCollection(collection).replaceOne(Filters.eq(key, value), docUpdate);
+
             return (int) updateResult.getModifiedCount();
 
         } catch (Exception e) {
@@ -388,22 +409,44 @@ private Gson getGson() {
         }
         return 0;
     }
+
     /**
-     * 
+     *
+     * @param key
+     * @param value
+     * @param docUpdate
+     * @return
+     */
+    public Integer replaceOne(Bson search, Document docUpdate) {
+        Integer documentosModificados = 0;
+
+        try {
+            UpdateResult updateResult = getDB().getCollection(collection).replaceOne(search, docUpdate);
+
+            return (int) updateResult.getModifiedCount();
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName() + "replaceOne()").log(Level.SEVERE, null, e);
+            exception = new Exception("replaceOne() ", e);
+        }
+        return 0;
+    }
+
+    /**
+     *
      * @param docSearch
      * @param docUpdate
      * @param options
-     * @return 
+     * @return
      */
     public Integer replaceOne(Document docSearch, Document docUpdate, String... options) {
         Integer documentosModificados = 0;
- 
 
         try {
             for (String arg : options) {
-        System.out.println(arg);
-    }
-            
+                System.out.println(arg);
+            }
+
             UpdateResult updateResult = getDB().getCollection(collection).replaceOne(docSearch, docUpdate);
             return (int) updateResult.getModifiedCount();
 
@@ -413,6 +456,7 @@ private Gson getGson() {
         }
         return 0;
     }
+
     /**
      * Busca el documento por la llave primaria
      *
@@ -528,8 +572,8 @@ private Gson getGson() {
     public List<T> findAll(Document... docSort) {
         Document sortQuery = new Document();
         try {
-if(docSort.length!=0){
-                sortQuery  = docSort[0]; 
+            if (docSort.length != 0) {
+                sortQuery = docSort[0];
 
             }
             Object t = entityClass.newInstance();
@@ -562,10 +606,10 @@ if(docSort.length!=0){
      * @return
      */
     public List<T> findBy(Document doc, Document... docSort) {
-         Document sortQuery = new Document();
+        Document sortQuery = new Document();
         try {
-if(docSort.length!=0){
-                sortQuery  = docSort[0]; 
+            if (docSort.length != 0) {
+                sortQuery = docSort[0];
 
             }
             Object t = entityClass.newInstance();
@@ -591,23 +635,23 @@ if(docSort.length!=0){
         }
         return list;
     }
+
     /**
-     * 
+     *
      * @param filter
      * @param docSort
-     * @return 
+     * @return
      */
-    public List<T> findBy(Bson filter,Document... docSort) {
+    public List<T> findBy(Bson filter, Document... docSort) {
         Document sortQuery = new Document();
         try {
-           
-            if(docSort.length!=0){
-                sortQuery  = docSort[0]; 
+
+            if (docSort.length != 0) {
+                sortQuery = docSort[0];
 
             }
-            
-//            Bson r1 = Filters.and(Filters.eq("a","b"), Filters.eq("c","d"));
 
+//            Bson r1 = Filters.and(Filters.eq("a","b"), Filters.eq("c","d"));
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
 
@@ -632,7 +676,8 @@ if(docSort.length!=0){
         }
         return list;
     }
- /**
+
+    /**
      * findLike Fuciona como el like "%s" en SQL
      *
      * @param key
@@ -640,21 +685,21 @@ if(docSort.length!=0){
      * @param docSort Document for sort
      * @return
      */
-     public List<T> findLike(String key, String value, Document... docSort) {
-          Document sortQuery = new Document();
+    public List<T> findLike(String key, String value, Document... docSort) {
+        Document sortQuery = new Document();
         list = new ArrayList<>();
 
         try {
 
-            if(docSort.length!=0){
-                sortQuery  = docSort[0]; 
+            if (docSort.length != 0) {
+                sortQuery = docSort[0];
 
             }
             Object t = entityClass.newInstance();
             Pattern regex = Pattern.compile(value);
 
             MongoDatabase db = getMongoClient().getDatabase(database);
-            FindIterable<Document> iterable = db.getCollection(collection).find(new Document(key, regex)).sort( sortQuery);
+            FindIterable<Document> iterable = db.getCollection(collection).find(new Document(key, regex)).sort(sortQuery);
             iterable.forEach(new Block<Document>() {
                 @Override
                 public void apply(final Document document) {
@@ -727,11 +772,11 @@ if(docSort.length!=0){
      * @param docSort
      * @return
      */
-    public List<T> helpers(String predicate, String key, String value,Document... docSort) {
+    public List<T> helpers(String predicate, String key, String value, Document... docSort) {
         Document sortQuery = new Document();
         try {
- if(docSort.length!=0){
-                sortQuery  = docSort[0]; 
+            if (docSort.length != 0) {
+                sortQuery = docSort[0];
 
             }
             Object t = entityClass.newInstance();
@@ -864,9 +909,6 @@ if(docSort.length!=0){
         };
         return iterable;
     }
-
-   
-  
 
     /**
      * cuenta todos los registros de un collection
