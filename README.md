@@ -33,27 +33,6 @@ It works similar to JPA,
 **2. Create beans**
 
 
-import com.google.gson.annotations.SerializedName;
-
-import com.jgmongo.anotaciones.Id;
-
-import com.jgmongo.services.GenericBeans;
-
-import lombok.Getter;
-
-import lombok.Setter;
-
-import org.bson.Document;
-
-
-/**
-
- *
- 
- * @author avbravo
- * 
- */
-
 @Getter
 
 @Setter
@@ -73,11 +52,7 @@ public class Paises extends GenericBeans {
     @SerializedName("Logo")
     
     private String logo;
-    
-    @SerializedName("Continente")
-    
-    private Continente continente;
-    
+   
 
      public Document toDocument(Paises paises) { 
     
