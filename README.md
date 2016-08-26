@@ -5,6 +5,11 @@ Java  Object Mapper for MongoDB
 * Java Driver for MongoDB 
 * GSon
 
+Contacts:
+Aristides Villareal Bravo
+email:avbravo@gmail.com
+http://avbravo.blogspot.com
+
 It works similar to JPA, 
 <a href="https://github.com/avbravo/jgmongo/wiki">visit Wiki for Documentation</a>
 # JGMongo
