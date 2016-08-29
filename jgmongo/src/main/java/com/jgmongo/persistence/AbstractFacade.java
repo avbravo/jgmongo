@@ -214,7 +214,7 @@ public abstract class AbstractFacade<T> {
 
             //verify primaryKey
             if (findById(t2) != null) {
-                exception = new Exception("You can not save because there is a document that id");
+                exception = new Exception("Please add the @Id annotation from package com.jgmongo.anotaciones.Id");
                 return false;
             }
             Object t = entityClass.newInstance();
