@@ -24,7 +24,7 @@ public class DateDeserializer implements JsonDeserializer<Date> {
     public Date deserialize(JsonElement je, Type type, JsonDeserializationContext jdc) throws JsonParseException {
         String date = je.getAsString();
         SimpleDateFormat formatter;
-        System.out.println("date "+date);
+       // System.out.println("date "+date);
         if (date.indexOf("T") == -1) {
             formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
           // System.out.println(date + " formater: MMM dd, yyyy HH:mm:ss a");
