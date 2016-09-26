@@ -38,7 +38,7 @@ public class DateDeserializer implements JsonDeserializer<Date> {
 
             return formatter.parse(date);
         } catch (Exception e) {
-            System.err.println("Failed to parse Date due to:" + e);
+            System.err.println("JGMongo.deserialize() Failed to parse Date due to:" + e);
             return null;
         }
     }
