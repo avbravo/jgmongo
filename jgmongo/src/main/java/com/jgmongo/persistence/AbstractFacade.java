@@ -213,10 +213,10 @@ public abstract class AbstractFacade<T> {
         try {
 
             //verify primaryKey
-            if (findById(t2) != null) {
-                exception = new Exception("Please add the @Id annotation from package com.jgmongo.anotaciones.Id");
-                return false;
-            }
+//            if (findById(t2) != null) {
+//                exception = new Exception("Please add the @Id annotation from package com.jgmongo.anotaciones.Id");
+//                return false;
+//            }
             Object t = entityClass.newInstance();
             Document doc = new Document();
             Method method;
