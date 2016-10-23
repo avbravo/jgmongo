@@ -32,7 +32,7 @@ It works similar to JPA,
          <dependency>
 	    <groupId>com.github.avbravo</groupId>
 	    <artifactId>jgmongo</artifactId>
-	    <version>0.3</version>
+	    <version>0.4</version>
 	</dependency>
     </dependencies>
 
