@@ -132,9 +132,9 @@ public abstract class AbstractFacade<T> {
             }
 
         }
-        for (PrimaryKey p : primaryKeyList) {
-            System.out.println(" " + p.toString());
-        }
+//        for (PrimaryKey p : primaryKeyList) {
+//            System.out.println(" " + p.toString());
+//        }
     }
 
     public MongoDatabase getDB() {
