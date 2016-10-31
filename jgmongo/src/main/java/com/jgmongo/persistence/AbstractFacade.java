@@ -515,6 +515,15 @@ public abstract class AbstractFacade<T> {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findBy() ", e);
         }
+        if(list == null || list.isEmpty()){
+            try {
+                return entityClass.newInstance();
+            } catch (InstantiationException ex) {
+                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         return list.get(0);
     }
 
