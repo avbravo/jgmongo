@@ -46,7 +46,7 @@ import java.util.Date;
  *
  * @author avbravo
  */
-public abstract class AbstractFacade<T> {
+public abstract class AbstractFacade1<T> {
 
     private Class<T> entityClass;
     private String database;
@@ -89,7 +89,7 @@ public abstract class AbstractFacade<T> {
 
     Integer contador = 0;
 
-    public AbstractFacade(Class<T> entityClass, String database, String collection) {
+    public AbstractFacade1(Class<T> entityClass, String database, String collection) {
         this.entityClass = entityClass;
         this.database = database;
         this.collection = collection;
@@ -158,12 +158,12 @@ public abstract class AbstractFacade<T> {
                     method = entityClass.getDeclaredMethod(name);
                     doc.put(util.letterToUpper(p.getName()), method.invoke(t2));
                 } catch (Exception e) {
-                    Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+                    Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
                     exception = new Exception("getDocumentPrimaryKey() ", e);
                 }
             }
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "docPrimaryKey()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "docPrimaryKey()").log(Level.SEVERE, null, e);
             exception = new Exception("docPrimaryKey() ", e);
         }
         return doc;
@@ -181,7 +181,7 @@ public abstract class AbstractFacade<T> {
                 doc.put(util.letterToUpper(p.getName()), 1);
             }
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "docPrimaryKey()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "docPrimaryKey()").log(Level.SEVERE, null, e);
             exception = new Exception("docPrimaryKey() ", e);
         }
         return doc;
@@ -198,7 +198,7 @@ public abstract class AbstractFacade<T> {
         try {
             doc = Document.parse(getGson().toJson(t2));
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "getDocument()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "getDocument()").log(Level.SEVERE, null, e);
             exception = new Exception("getDocument ", e);
         }
         return doc;
@@ -224,13 +224,13 @@ public abstract class AbstractFacade<T> {
                 method = entityClass.getDeclaredMethod("toDocument", entityClass);
                 doc = (Document) method.invoke(t, t2);
             } catch (Exception e) {
-                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+                Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
                 exception = new Exception("save() ", e);
             }
             getDB().getCollection(collection).insertOne(doc);
             return true;
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "save()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "save()").log(Level.SEVERE, null, e);
             exception = new Exception("save() ", e);
         }
         return false;
@@ -253,7 +253,7 @@ public abstract class AbstractFacade<T> {
             getDB().getCollection(collection).createIndex(docIndex);
             return true;
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "createIndex()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "createIndex()").log(Level.SEVERE, null, e);
             exception = new Exception("createIndex() ", e);
         }
         return false;
@@ -270,7 +270,7 @@ public abstract class AbstractFacade<T> {
             getDB().getCollection(collection).deleteOne(doc);
             return true;
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "remove()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "remove()").log(Level.SEVERE, null, e);
             exception = new Exception("remove() ", e);
         }
         return false;
@@ -282,7 +282,7 @@ public abstract class AbstractFacade<T> {
             DeleteResult dr = getDB().getCollection(collection).deleteMany(doc);
             cont = (int) dr.getDeletedCount();
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "deleteManye()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "deleteManye()").log(Level.SEVERE, null, e);
             exception = new Exception("deleteMany() ", e);
         }
         return cont;
@@ -300,7 +300,7 @@ public abstract class AbstractFacade<T> {
 
             cont = (int) dr.getDeletedCount();
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
             exception = new Exception("removeAll() ", e);
         }
         return cont;
@@ -318,7 +318,7 @@ public abstract class AbstractFacade<T> {
             return true;
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "removeDocument()").log(Level.SEVERE, null, e);
             exception = new Exception("removeAll() ", e);
         }
         return false;
@@ -344,7 +344,7 @@ public abstract class AbstractFacade<T> {
             return (int) updateResult.getModifiedCount();
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "updateOne()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "updateOne()").log(Level.SEVERE, null, e);
             exception = new Exception("updateOne() ", e);
         }
         return 0;
@@ -359,7 +359,7 @@ public abstract class AbstractFacade<T> {
             return (int) updateResult.getModifiedCount();
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "updateOne()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "updateOne()").log(Level.SEVERE, null, e);
             exception = new Exception("updateOne() ", e);
         }
         return 0;
@@ -381,7 +381,7 @@ public abstract class AbstractFacade<T> {
             return (int) updateResult.getModifiedCount();
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "updateMany()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "updateMany()").log(Level.SEVERE, null, e);
             exception = new Exception("updateMany() ", e);
         }
         return 0;
@@ -404,7 +404,7 @@ public abstract class AbstractFacade<T> {
             return (int) updateResult.getModifiedCount();
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "replaceOne()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "replaceOne()").log(Level.SEVERE, null, e);
             exception = new Exception("replaceOne() ", e);
         }
         return 0;
@@ -426,7 +426,7 @@ public abstract class AbstractFacade<T> {
             return (int) updateResult.getModifiedCount();
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "replaceOne()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "replaceOne()").log(Level.SEVERE, null, e);
             exception = new Exception("replaceOne() ", e);
         }
         return 0;
@@ -451,7 +451,7 @@ public abstract class AbstractFacade<T> {
             return (int) updateResult.getModifiedCount();
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "updateOne()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "updateOne()").log(Level.SEVERE, null, e);
             exception = new Exception("updateOne() ", e);
         }
         return 0;
@@ -477,45 +477,17 @@ public abstract class AbstractFacade<T> {
                         method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         t1 = (T) method.invoke(t, document);
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "find()").log(Level.SEVERE, null, e);
                         exception = new Exception("findById() ", e);
                     }
 
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findById() ", e);
         }
         return (T) t1;
-    }
-
-      public T findById(Document doc) {
-
-        try {
-            
-            Object t = entityClass.newInstance();
-            list = new ArrayList<>();
-
-            MongoDatabase db = getMongoClient().getDatabase(database);
-            FindIterable<Document> iterable = db.getCollection(collection).find(doc);
-            iterable.forEach(new Block<Document>() {
-                @Override
-                public void apply(final Document document) {
-                    try {
-                        Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
-                        list.add((T) method.invoke(t, document));
-                    } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
-                        exception = new Exception("findBy()", e);
-                    }
-                }
-            });
-        } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-            exception = new Exception("findBy() ", e);
-        }
-        return list.get(0);
     }
 
     /**
@@ -542,7 +514,7 @@ public abstract class AbstractFacade<T> {
                         method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         t1 = (T) method.invoke(t, document);
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "find()").log(Level.SEVERE, null, e);
                         exception = new Exception("find() ", e);
                     }
 
@@ -550,7 +522,7 @@ public abstract class AbstractFacade<T> {
             });
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("find() ", e);
         }
         return (T) t1;
@@ -579,14 +551,14 @@ public abstract class AbstractFacade<T> {
                         method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         t1 = (T) method.invoke(t, document);
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "find()").log(Level.SEVERE, null, e);
                         exception = new Exception("find() ", e);
                     }
                 }
             });
 
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "find()").log(Level.SEVERE, null, e);
             exception = new Exception("find() ", e);
         }
         return (T) t1;
@@ -615,13 +587,13 @@ public abstract class AbstractFacade<T> {
                         Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "find()").log(Level.SEVERE, null, e);
                         exception = new Exception("findAll()", e);
                     }
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findAll()", e);
         }
         return list;
@@ -652,13 +624,13 @@ public abstract class AbstractFacade<T> {
                         Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "findAll()").log(Level.SEVERE, null, e);
                         exception = new Exception("findBy()", e);
                     }
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findBy() ", e);
         }
         return list;
@@ -693,13 +665,13 @@ public abstract class AbstractFacade<T> {
                         Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "findAll()").log(Level.SEVERE, null, e);
                         exception = new Exception("findBy()", e);
                     }
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findBy() ", e);
         }
         return list;
@@ -735,13 +707,13 @@ public abstract class AbstractFacade<T> {
                         Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "findLike()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "findLike()").log(Level.SEVERE, null, e);
                         exception = new Exception("findLike()", e);
                     }
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findLike()", e);
         }
         return list;
@@ -780,13 +752,13 @@ public abstract class AbstractFacade<T> {
                         Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "findAll()").log(Level.SEVERE, null, e);
                         exception = new Exception("findHelperSort()", e);
                     }
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findHelperSort()", e);
         }
         return list;
@@ -831,13 +803,13 @@ public abstract class AbstractFacade<T> {
                         Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "findAll()").log(Level.SEVERE, null, e);
                         exception = new Exception("helpers()", e);
                     }
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("helpers()", e);
         }
         return list;
@@ -949,7 +921,7 @@ public abstract class AbstractFacade<T> {
 
             records = getMongoClient().getDatabase(database).getCollection(collection).count();
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "count()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "count()").log(Level.SEVERE, null, e);
             exception = new Exception("count()", e);
         }
 
@@ -975,13 +947,13 @@ public abstract class AbstractFacade<T> {
                     try {
                         contador++;
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "count()").log(Level.SEVERE, null, e);
+                        Logger.getLogger(AbstractFacade1.class.getName() + "count()").log(Level.SEVERE, null, e);
                         exception = new Exception("count()", e);
                     }
                 }
             });
         } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName() + "count()").log(Level.SEVERE, null, e);
+            Logger.getLogger(AbstractFacade1.class.getName() + "count()").log(Level.SEVERE, null, e);
             exception = new Exception("count()", e);
         }
         return contador;
