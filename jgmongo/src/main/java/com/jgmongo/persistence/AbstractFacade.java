@@ -506,14 +506,14 @@ public abstract class AbstractFacade<T> {
                         Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
                         list.add((T) method.invoke(t, document));
                     } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
-                        exception = new Exception("findBy()", e);
+                        Logger.getLogger(AbstractFacade.class.getName() + "findById()").log(Level.SEVERE, null, e);
+                        exception = new Exception("findById()", e);
                     }
                 }
             });
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-            exception = new Exception("findBy() ", e);
+            exception = new Exception("findById() ", e);
         }
         if(list == null || list.isEmpty()){
             try {
