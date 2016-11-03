@@ -60,16 +60,24 @@ public class Paises extends GenericBeans {
     private String logo;
    
 
-     public Document toDocument(Paises paises) { 
-    
-        return toDoc(paises);
-        
+    public Document toDocument(Paises paises) {
+        Document doc = new Document();
+        try {
+            doc = Document.parse(getGson().toJson(paises));
+        } catch (Exception e) {
+            System.out.println("toDocument() " + e.getLocalizedMessage());
+        }
+        return doc;
     }
 
-    public Paises toPojo(Document doc) { 
-    
-        return (Paises) toJava(doc, Paises.class);
-        
+    public Paises toPojo(Document doc) {
+        Paises paises = new Paises();
+        try {
+            paises = (Paises) fromJsontoPojo(doc.toJson(), new Paises().getClass());
+        } catch (Exception e) {
+            System.out.println("toPojo() " + e.getLocalizedMessage());
+        }
+        return paises;
     }
 
     @Override
