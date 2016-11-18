@@ -331,6 +331,7 @@ public abstract class AbstractFacade<T> {
      * @return
      */
     public Integer update(T t2) {
+        System.out.println("");
         return updateOne(t2, new Document("$set", getDocument(t2)));
     }
 
@@ -548,11 +549,15 @@ public abstract class AbstractFacade<T> {
 
                     Method method;
                     try {
+
                         method = entityClass.getDeclaredMethod("toPojo", Document.class);
+      
                         t1 = (T) method.invoke(t, document);
+                  
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
                         exception = new Exception("find() ", e);
+                       
                     }
 
                 }
@@ -561,7 +566,9 @@ public abstract class AbstractFacade<T> {
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("find() ", e);
+          
         }
+
         return (T) t1;
     }
 
