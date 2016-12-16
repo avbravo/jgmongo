@@ -56,24 +56,24 @@ public abstract class AbstractFacade<T> {
     Exception exception;
     Util util = new Util();
 
-//private Gson getGson() {
-//
-//        Gson gson = new GsonBuilder()
-//               .setPrettyPrinting()
-//          .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//               .create();
-//
-//        return gson;
-//    }
-    private Gson getGson() {
+private Gson getGson() {
 
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, new DateDeserializer())
-                .setPrettyPrinting()
-                .create();
+               .setPrettyPrinting()
+          .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+               .create();
 
         return gson;
     }
+//    private Gson getGson() {
+//
+//        Gson gson = new GsonBuilder()
+//                .registerTypeAdapter(Date.class, new DateDeserializer())
+//                .setPrettyPrinting()
+//                .create();
+//
+//        return gson;
+//    }
 
     public Exception getException() {
         return exception;

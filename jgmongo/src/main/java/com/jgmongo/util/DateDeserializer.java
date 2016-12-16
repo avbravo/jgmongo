@@ -10,7 +10,9 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -24,6 +26,11 @@ public class DateDeserializer implements JsonDeserializer<Date> {
     public Date deserialize(JsonElement je, Type type, JsonDeserializationContext jdc) throws JsonParseException {
         String date = je.getAsString();
         SimpleDateFormat formatter;
+        // prints "Sep 6, 2009"
+   
+          
+          
+        
        // System.out.println("date "+date);
         if (date.indexOf("T") == -1) {
             formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
