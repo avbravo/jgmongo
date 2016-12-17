@@ -5,11 +5,12 @@
  */
 package com.jgmongo.util;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Logger;
+import java.util.TimeZone;
 import javax.swing.JOptionPane;
 
 /**
@@ -17,16 +18,52 @@ import javax.swing.JOptionPane;
  * @author avbravo
  */
 public class Fechas {
-/**
- * 
- * @param date
- * @param formato yyyy-MM-dd
- * @return 
- */
-    public Date conversor(String date,String formato) {
+
+    /**
+     *
+     * @param date
+     * @param formato yyyy-MM-dd
+     * @return
+     */
+    /**
+     * convierte a ISODate
+     *
+     * @param date
+     * @return
+     */
+    public static Date convertISODate(Date date) {
+        String nowAsISO = "";
+        try {
+            TimeZone tz = TimeZone.getTimeZone("UTC");
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+            df.setTimeZone(tz);
+            nowAsISO = df.format(date);
+//            System.out.println("----->>>>> fechacompra " + df.toString());
+//            System.out.println("----->>>>> converter " + nowAsISO);
+        } catch (Exception e) {
+            System.out.println("convertISODate() " + e.getLocalizedMessage());
+        }
+        return convertStringToDate(nowAsISO);
+    }
+
+    public static Date convertStringToDate(String dateString) {
+        Date date = null;
+//        Date formatteddate = null;
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+        try {
+            date = df.parse(dateString);
+        //    sout formatteddate = df.format(date);
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }
+//        return formatteddate;
+        return date;
+    }
+
+    public static Date conversor(String date, String formato) {
 
         SimpleDateFormat formatter;
-formatter = new SimpleDateFormat(formato);
+        formatter = new SimpleDateFormat(formato);
 //        if (date.indexOf("T") == -1) {
 //            formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
 //            System.out.println(date + " formater: MMM dd, yyyy HH:mm:ss a");
@@ -41,13 +78,10 @@ formatter = new SimpleDateFormat(formato);
             return formatter.parse(date);
         } catch (Exception e) {
             System.err.println("Failed to parse Date due to:" + e);
-            JOptionPane.showMessageDialog(null, "conversor() "+e.getLocalizedMessage());
+            JOptionPane.showMessageDialog(null, "conversor() " + e.getLocalizedMessage());
             return null;
         }
     }
-    
-    
-   
 
     public java.sql.Date converterDate(java.util.Date fecha) {
         try {
@@ -55,7 +89,7 @@ formatter = new SimpleDateFormat(formato);
             java.sql.Date dtfecha = new java.sql.Date(lfecha);
             return dtfecha;
         } catch (Exception e) {
-       JOptionPane.showMessageDialog(null,"converterDate() " + e.getLocalizedMessage());
+            JOptionPane.showMessageDialog(null, "converterDate() " + e.getLocalizedMessage());
         }
         return null;
     }

@@ -27,19 +27,16 @@ public class DateDeserializer implements JsonDeserializer<Date> {
         String date = je.getAsString();
         SimpleDateFormat formatter;
         // prints "Sep 6, 2009"
-   
-          
-          
-        
-       // System.out.println("date "+date);
+
+        // System.out.println("date "+date);
         if (date.indexOf("T") == -1) {
             formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
-          // System.out.println(date + " formater: MMM dd, yyyy HH:mm:ss a");
+            // System.out.println(date + " formater: MMM dd, yyyy HH:mm:ss a");
 
         } else {
             date = date.replace("T", " ");
             formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-       //  System.out.println(date + " formater: yyyy-MM-dd HH:mm:ss");
+            //  System.out.println(date + " formater: yyyy-MM-dd HH:mm:ss");
         }
         try {
 
