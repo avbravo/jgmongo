@@ -31,12 +31,12 @@ public class DateDeserializer implements JsonDeserializer<Date> {
         // System.out.println("date "+date);
         if (date.indexOf("T") == -1) {
             formatter = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss a");
-            // System.out.println(date + " formater: MMM dd, yyyy HH:mm:ss a");
+           System.out.println(date + "aplicando formater: MMM dd, yyyy HH:mm:ss a");
 
         } else {
             date = date.replace("T", " ");
             formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            //  System.out.println(date + " formater: yyyy-MM-dd HH:mm:ss");
+           System.out.println(date + "aplicando formater: yyyy-MM-dd HH:mm:ss");
         }
         try {
 
