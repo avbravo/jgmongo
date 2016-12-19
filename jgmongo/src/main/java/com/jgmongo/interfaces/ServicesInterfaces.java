@@ -5,8 +5,6 @@
  */
 package com.jgmongo.interfaces;
 
-
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jgmongo.util.DateDeserializer;
@@ -23,8 +21,6 @@ import org.bson.Document;
  */
 public interface ServicesInterfaces<T> {
 
-    
-    
     default public Document toDoc(T t) {
         Document doc = new Document();
         try {
@@ -33,18 +29,20 @@ public interface ServicesInterfaces<T> {
             System.out.println("toDocument() " + e.getLocalizedMessage());
         }
         return doc;
-    } 
-    
-   default T toJava(Document doc,T t1) {
-      
-           T o=fromJsontoJava(doc.toJson(), (Class<T>) t1);
-        
+    }
+
+    default T toJava(Document doc, T t1) {
+
+        T o = fromJsontoJava(doc.toJson(), (Class<T>) t1);
+
         return o;
     }
+
     default <T> T fromJsontoJava(String json, Class<T> clazz) {
         T jsonToObject = getGson().fromJson(json, clazz);
         return jsonToObject;
     }
+
     /**
      * devuelve el json como un string
      *
@@ -73,7 +71,6 @@ public interface ServicesInterfaces<T> {
      *
      * @return
      */
-
 //    default Gson getGson() {
 //
 //        Gson gson = new GsonBuilder()
@@ -83,31 +80,64 @@ public interface ServicesInterfaces<T> {
 //
 //        return gson;
 //    }
+    /**
+     * formato de fecha
+     *
+     * @param dateformat
+     * @return
+     */
+    default Gson getGson(String... dateformat) {
+        String format = "dd/MM/yyyy HH:mm:ss a";
+        if (dateformat.length != 0) {
+            format = dateformat[0];
 
-    default Gson getGson() {
-
+        }
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, new DateDeserializer())
+                .setDateFormat("dd/MM/yyyy HH:mm:ss a")
                 .setPrettyPrinting()
-              
                 .create();
 
         return gson;
     }
-    default Gson getGsonDate() {
+
+//    default Gson getGson() {
+//      
+//        Gson gson = new GsonBuilder()
+//                .setDateFormat("dd/MM/yyyy HH:mm:ss a")
+//                .setPrettyPrinting()
+//              
+//                .create();
+//
+//        return gson;
+//    }
+    default Gson getGsonFecha() {
 
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, new DateDeserializer())
+                .setDateFormat("dd/MM/yyyy")
                 .setPrettyPrinting()
-              
                 .create();
 
         return gson;
     }
-    
 
-
-
-    
+//    default Gson getGson() {
+//
+//        Gson gson = new GsonBuilder()
+//                .registerTypeAdapter(Date.class, new DateDeserializer())
+//                .setPrettyPrinting()
+//              
+//                .create();
+//
+//        return gson;
+//    }
+//    default Gson getGsonDate() {
+//
+//        Gson gson = new GsonBuilder()
+//                .registerTypeAdapter(Date.class, new DateDeserializer())
+//                .setPrettyPrinting()
+//                .create();
+//
+//        return gson;
+//    }
 
 }

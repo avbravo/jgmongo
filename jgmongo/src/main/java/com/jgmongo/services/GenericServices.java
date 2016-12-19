@@ -47,10 +47,10 @@ public class GenericServices<T> implements ServicesInterfaces {
      * @param clazz
      * @return 
      */
-    public <T> T fromJsontoPojoDate(String json, Class<T> clazz) {
-        T jsonToObject = getGsonDate().fromJson(json, clazz);
-        return jsonToObject;
-    }
+//    public <T> T fromJsontoPojoDate(String json, Class<T> clazz) {
+//        T jsonToObject = getGsonDate().fromJson(json, clazz);
+//        return jsonToObject;
+//    }
     
   
 
