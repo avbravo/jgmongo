@@ -110,15 +110,15 @@ public interface ServicesInterfaces<T> {
 //
 //        return gson;
 //    }
-    default Gson getGsonFecha() {
-
-        Gson gson = new GsonBuilder()
-                .setDateFormat("dd/MM/yyyy")
-                .setPrettyPrinting()
-                .create();
-
-        return gson;
-    }
+//    default Gson getGsonFecha() {
+//
+//        Gson gson = new GsonBuilder()
+//                .setDateFormat("dd/MM/yyyy")
+//                .setPrettyPrinting()
+//                .create();
+//
+//        return gson;
+//    }
 
 //    default Gson getGson() {
 //

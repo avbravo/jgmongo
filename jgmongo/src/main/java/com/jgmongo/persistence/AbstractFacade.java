@@ -65,15 +65,30 @@ public abstract class AbstractFacade<T> {
 //
 //        return gson;
 //    }
-    private Gson getGson() {
+    
+  private Gson getGson(String... dateformat) {
+        String format = "dd/MM/yyyy HH:mm:ss a";
+        if (dateformat.length != 0) {
+            format = dateformat[0];
 
+        }
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Date.class, new DateDeserializer())
+                .setDateFormat("dd/MM/yyyy HH:mm:ss a")
                 .setPrettyPrinting()
                 .create();
 
         return gson;
     }
+    
+//    private Gson getGson() {
+//
+//        Gson gson = new GsonBuilder()
+//                .registerTypeAdapter(Date.class, new DateDeserializer())
+//                .setPrettyPrinting()
+//                .create();
+//
+//        return gson;
+//    }
 
     public Exception getException() {
         return exception;
