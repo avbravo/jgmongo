@@ -24,6 +24,7 @@ import com.mongodb.client.model.Filters;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.gt;
 import static com.mongodb.client.model.Filters.lt;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import static com.mongodb.client.model.Indexes.ascending;
 import static com.mongodb.client.model.Indexes.descending;
+import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.result.UpdateResult;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -542,6 +544,54 @@ public abstract class AbstractFacade<T> {
         }
         return list.get(0);
     }
+      /**
+       * 
+       * @param key
+       * @param value
+       * @param field
+       * @return 
+       */
+      public T findOneAndUpdate(String key, String value,String field) {
+
+        try {
+            Document doc = new Document(key, value);
+            Document inc = new Document("$inc",new Document(field,1));
+            
+         FindOneAndUpdateOptions	findOneAndUpdateOptions	= new FindOneAndUpdateOptions();
+         findOneAndUpdateOptions.upsert(true);
+         
+	findOneAndUpdateOptions.returnDocument( ReturnDocument.AFTER );
+         
+            Object t = entityClass.newInstance();
+            list = new ArrayList<>();
+
+            MongoDatabase db = getMongoClient().getDatabase(database);
+            Document iterable = db.getCollection(collection).findOneAndUpdate(doc,inc,findOneAndUpdateOptions);
+            
+               try{
+                        Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
+                        list.add((T) method.invoke(t, iterable));
+                    } catch (Exception e) {
+                        Logger.getLogger(AbstractFacade.class.getName() + "findOneAndUpdate()").log(Level.SEVERE, null, e);
+                        exception = new Exception("findOneAndUpdate()", e);
+                    }
+                
+           
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            exception = new Exception("findOneAndUpdate()", e);
+        }
+        if(list == null || list.isEmpty()){
+            try {
+                return entityClass.newInstance();
+            } catch (InstantiationException ex) {
+                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return list.get(0);
+    }
 
     /**
      * search document String value
@@ -622,6 +672,7 @@ public abstract class AbstractFacade<T> {
         }
         return (T) t1;
     }
+    
 
     /**
      *
