@@ -67,8 +67,8 @@ public abstract class AbstractFacade<T> {
 //
 //        return gson;
 //    }
-    
-  private Gson getGson(String... dateformat) {
+
+    private Gson getGson(String... dateformat) {
         String format = "dd/MM/yyyy HH:mm:ss a";
         if (dateformat.length != 0) {
             format = dateformat[0];
@@ -81,7 +81,7 @@ public abstract class AbstractFacade<T> {
 
         return gson;
     }
-    
+
 //    private Gson getGson() {
 //
 //        Gson gson = new GsonBuilder()
@@ -91,7 +91,6 @@ public abstract class AbstractFacade<T> {
 //
 //        return gson;
 //    }
-
     public Exception getException() {
         return exception;
     }
@@ -508,10 +507,10 @@ public abstract class AbstractFacade<T> {
         return (T) t1;
     }
 
-      public T findById(Document doc) {
+    public T findById(Document doc) {
 
         try {
-            
+
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
 
@@ -533,7 +532,7 @@ public abstract class AbstractFacade<T> {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findById() ", e);
         }
-        if(list == null || list.isEmpty()){
+        if (list == null || list.isEmpty()) {
             try {
                 return entityClass.newInstance();
             } catch (InstantiationException ex) {
@@ -544,49 +543,49 @@ public abstract class AbstractFacade<T> {
         }
         return list.get(0);
     }
-      /**
-       * 
-       * @param key
-       * @param value
-       * @param field
-       * @return 
-       */
-      public T findOneAndUpdate(String key, String value,String field,Integer... incremento) {
+
+    /**
+     *
+     * @param key
+     * @param value
+     * @param field
+     * @return
+     */
+    public T findOneAndUpdate(String key, String value, String field, Integer... incremento) {
 
         try {
-            Integer increment =1;
-             if (incremento.length != 0) {
-              increment= incremento[0];
+            Integer increment = 1;
+            if (incremento.length != 0) {
+                increment = incremento[0];
 
             }
             Document doc = new Document(key, value);
-            Document inc = new Document("$inc",new Document(field,increment));
-            
-         FindOneAndUpdateOptions	findOneAndUpdateOptions	= new FindOneAndUpdateOptions();
-         findOneAndUpdateOptions.upsert(true);
-         
-	findOneAndUpdateOptions.returnDocument( ReturnDocument.AFTER );
-         
+            Document inc = new Document("$inc", new Document(field, increment));
+
+            FindOneAndUpdateOptions findOneAndUpdateOptions = new FindOneAndUpdateOptions();
+            findOneAndUpdateOptions.upsert(true);
+
+            findOneAndUpdateOptions.returnDocument(ReturnDocument.AFTER);
+
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
 
             MongoDatabase db = getMongoClient().getDatabase(database);
-            Document iterable = db.getCollection(collection).findOneAndUpdate(doc,inc,findOneAndUpdateOptions);
-            
-               try{
-                        Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
-                        list.add((T) method.invoke(t, iterable));
-                    } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "findOneAndUpdate()").log(Level.SEVERE, null, e);
-                        exception = new Exception("findOneAndUpdate()", e);
-                    }
-                
-           
+            Document iterable = db.getCollection(collection).findOneAndUpdate(doc, inc, findOneAndUpdateOptions);
+
+            try {
+                Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
+                list.add((T) method.invoke(t, iterable));
+            } catch (Exception e) {
+                Logger.getLogger(AbstractFacade.class.getName() + "findOneAndUpdate()").log(Level.SEVERE, null, e);
+                exception = new Exception("findOneAndUpdate()", e);
+            }
+
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("findOneAndUpdate()", e);
         }
-        if(list == null || list.isEmpty()){
+        if (list == null || list.isEmpty()) {
             try {
                 return entityClass.newInstance();
             } catch (InstantiationException ex) {
@@ -621,13 +620,13 @@ public abstract class AbstractFacade<T> {
                     try {
 
                         method = entityClass.getDeclaredMethod("toPojo", Document.class);
-      
+
                         t1 = (T) method.invoke(t, document);
-                  
+
                     } catch (Exception e) {
                         Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
                         exception = new Exception("find() ", e);
-                       
+
                     }
 
                 }
@@ -636,7 +635,7 @@ public abstract class AbstractFacade<T> {
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
             exception = new Exception("find() ", e);
-          
+
         }
 
         return (T) t1;
@@ -677,7 +676,6 @@ public abstract class AbstractFacade<T> {
         }
         return (T) t1;
     }
-    
 
     /**
      *
