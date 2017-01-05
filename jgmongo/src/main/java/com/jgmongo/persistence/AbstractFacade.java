@@ -551,11 +551,16 @@ public abstract class AbstractFacade<T> {
        * @param field
        * @return 
        */
-      public T findOneAndUpdate(String key, String value,String field) {
+      public T findOneAndUpdate(String key, String value,String field,Integer... incremento) {
 
         try {
+            Integer increment =1;
+             if (incremento.length != 0) {
+              increment= incremento[0];
+
+            }
             Document doc = new Document(key, value);
-            Document inc = new Document("$inc",new Document(field,1));
+            Document inc = new Document("$inc",new Document(field,increment));
             
          FindOneAndUpdateOptions	findOneAndUpdateOptions	= new FindOneAndUpdateOptions();
          findOneAndUpdateOptions.upsert(true);
