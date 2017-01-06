@@ -44,6 +44,7 @@ import com.mongodb.client.result.UpdateResult;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  *
@@ -597,6 +598,119 @@ public abstract class AbstractFacade<T> {
         }
         return list.get(0);
     }
+
+    /**
+     * findOneAndUpdate
+     *
+     * @param doc
+     * @param field
+     * @param incremento
+     * @return
+     */
+    public T findOneAndUpdate(Document doc, String field, Integer... incremento) {
+         try {
+            Integer increment = 1;
+            if (incremento.length != 0) {
+                increment = incremento[0];
+
+            }
+           
+            Document inc = new Document("$inc", new Document(field, increment));
+
+            FindOneAndUpdateOptions findOneAndUpdateOptions = new FindOneAndUpdateOptions();
+            findOneAndUpdateOptions.upsert(true);
+
+            findOneAndUpdateOptions.returnDocument(ReturnDocument.AFTER);
+
+            Object t = entityClass.newInstance();
+            list = new ArrayList<>();
+
+            MongoDatabase db = getMongoClient().getDatabase(database);
+            Document iterable = db.getCollection(collection).findOneAndUpdate(doc, inc, findOneAndUpdateOptions);
+
+            try {
+                Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
+                list.add((T) method.invoke(t, iterable));
+            } catch (Exception e) {
+                Logger.getLogger(AbstractFacade.class.getName() + "findOneAndUpdate()").log(Level.SEVERE, null, e);
+                exception = new Exception("findOneAndUpdate()", e);
+            }
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            exception = new Exception("findOneAndUpdate()", e);
+        }
+        if (list == null || list.isEmpty()) {
+            try {
+                return entityClass.newInstance();
+            } catch (InstantiationException ex) {
+                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return list.get(0); 
+    }
+    /**
+     * 
+     * @param doc
+     * @param inc
+     * @param incremento
+     * @return 
+     */
+    public T findOneAndUpdate(Document doc, Document inc, Integer... incremento) {
+         try {
+           
+            FindOneAndUpdateOptions findOneAndUpdateOptions = new FindOneAndUpdateOptions();
+            findOneAndUpdateOptions.upsert(true);
+
+            findOneAndUpdateOptions.returnDocument(ReturnDocument.AFTER);
+
+            Object t = entityClass.newInstance();
+            list = new ArrayList<>();
+
+            MongoDatabase db = getMongoClient().getDatabase(database);
+            Document iterable = db.getCollection(collection).findOneAndUpdate(doc, inc, findOneAndUpdateOptions);
+
+            try {
+                Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
+                list.add((T) method.invoke(t, iterable));
+            } catch (Exception e) {
+                Logger.getLogger(AbstractFacade.class.getName() + "findOneAndUpdate()").log(Level.SEVERE, null, e);
+                exception = new Exception("findOneAndUpdate()", e);
+            }
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            exception = new Exception("findOneAndUpdate()", e);
+        }
+        if (list == null || list.isEmpty()) {
+            try {
+                return entityClass.newInstance();
+            } catch (InstantiationException ex) {
+                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return list.get(0); 
+    }
+    
+   
+
+    
+    
+    
+    
+    /**
+     * ejecuta el finOneAndUpdate()
+     *
+     * @param doc
+     * @param inc
+     * @param incremento
+     * @return
+     */
+    
 
     /**
      * search document String value
