@@ -3,14 +3,19 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jgmongo</groupId>
     <artifactId>jgmongo</artifactId>
-    <version>0.9.2</version>
+    <version>0.9.3</version>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
-            <version>3.3.0</version>
+            <version>3.4.0</version>
         </dependency>
+<!--        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver</artifactId>
+            <version>3.3.0</version>
+        </dependency>-->
          <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
