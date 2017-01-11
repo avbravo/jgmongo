@@ -901,6 +901,81 @@ Document doc = new Document(key, value);
         }
         return list;
     }
+    
+    /**
+     * 
+     * @param key
+     * @param value
+     * @param docSort
+     * @return 
+     */
+    public List<T> findBy(String key, Date value, Document... docSort) {
+        Document sortQuery = new Document();
+        try {
+            if (docSort.length != 0) {
+                sortQuery = docSort[0];
+
+            }
+            Object t = entityClass.newInstance();
+            list = new ArrayList<>();
+Document doc = new Document(key, value);
+            MongoDatabase db = getMongoClient().getDatabase(database);
+            FindIterable<Document> iterable = db.getCollection(collection).find(doc).sort(sortQuery);
+            iterable.forEach(new Block<Document>() {
+                @Override
+                public void apply(final Document document) {
+                    try {
+                        Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
+                        list.add((T) method.invoke(t, document));
+                    } catch (Exception e) {
+                        Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
+                        exception = new Exception("findBy()", e);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            exception = new Exception("findBy() ", e);
+        }
+        return list;
+    }
+    /**
+     * 
+     * @param key
+     * @param value
+     * @param docSort
+     * @return 
+     */
+    public List<T> findBy(String key, Integer value, Document... docSort) {
+        Document sortQuery = new Document();
+        try {
+            if (docSort.length != 0) {
+                sortQuery = docSort[0];
+
+            }
+            Object t = entityClass.newInstance();
+            list = new ArrayList<>();
+Document doc = new Document(key, value);
+            MongoDatabase db = getMongoClient().getDatabase(database);
+            FindIterable<Document> iterable = db.getCollection(collection).find(doc).sort(sortQuery);
+            iterable.forEach(new Block<Document>() {
+                @Override
+                public void apply(final Document document) {
+                    try {
+                        Method method = entityClass.getDeclaredMethod("toPojo", Document.class);
+                        list.add((T) method.invoke(t, document));
+                    } catch (Exception e) {
+                        Logger.getLogger(AbstractFacade.class.getName() + "findAll()").log(Level.SEVERE, null, e);
+                        exception = new Exception("findBy()", e);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            exception = new Exception("findBy() ", e);
+        }
+        return list;
+    }
 
     /**
      *
