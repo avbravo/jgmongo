@@ -7,10 +7,11 @@ package com.jgmongo.persistence;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.jgmongo.anotaciones.Embedded;
 import com.jgmongo.anotaciones.Id;
+import com.jgmongo.beans.EmbeddedBeans;
 
-import com.jgmongo.anotaciones.PrimaryKey;
-import com.jgmongo.util.DateDeserializer;
+import com.jgmongo.beans.PrimaryKey;
 import com.jgmongo.util.Util;
 import com.mongodb.Block;
 import com.mongodb.CursorType;
@@ -44,7 +45,6 @@ import com.mongodb.client.result.UpdateResult;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Date;
-import java.util.Optional;
 
 /**
  *
@@ -55,8 +55,11 @@ public abstract class AbstractFacade<T> {
     private Class<T> entityClass;
     private String database;
     private String collection;
+    //lazy load
+    private Boolean lazy;
     List<T> list = new ArrayList<>();
     List<PrimaryKey> primaryKeyList = new ArrayList<>();
+    List<EmbeddedBeans> embeddedBeansList = new ArrayList<>();
     Exception exception;
     Util util = new Util();
 //
@@ -107,23 +110,31 @@ public abstract class AbstractFacade<T> {
 
     Integer contador = 0;
 
-    public AbstractFacade(Class<T> entityClass, String database, String collection) {
+    public AbstractFacade(Class<T> entityClass, String database, String collection, Boolean... lazy) {
         this.entityClass = entityClass;
         this.database = database;
         this.collection = collection;
+        Boolean l = false;
+        if (lazy.length != 0) {
+            l = lazy[0];
+
+        }
+        this.lazy = l;
+
         primaryKeyList = new ArrayList<>();
+        embeddedBeansList = new ArrayList<>();
         /**
          * lee las anotaciones @Id para obtener los PrimaryKey del documento
          */
         final Field[] variables = entityClass.getDeclaredFields();
         for (final Field variable : variables) {
             final Annotation anotacion = variable.getAnnotation(Id.class);
+            final Annotation anotacionEmbedded = variable.getAnnotation(Embedded.class);
 
             if (anotacion != null) {
                 final Id anotacionPK = (Id) anotacion;
                 PrimaryKey primaryKey = new PrimaryKey();
-//                primaryKey.setName(anotacionPK.name());
-//                primaryKey.setType(anotacionPK.type());
+
                 Boolean found = false;
                 for (PrimaryKey pk : primaryKeyList) {
                     if (pk.getName().equals(primaryKey.getName())) {
@@ -131,8 +142,6 @@ public abstract class AbstractFacade<T> {
                     }
                 }
                 variable.setAccessible(true);
-//                  System.out.println("Nombre del atributo: " + variable.getName());
-//                  System.out.println("+++++++++++++++++++++++++++++++++++++++++");
                 primaryKey.setName(variable.getName());
                 primaryKey.setType(variable.getType().getName());
 
@@ -141,18 +150,28 @@ public abstract class AbstractFacade<T> {
                     primaryKeyList.add(primaryKey);
                 }
 
-//                break;
             }
             //Llave primary
             if (primaryKeyList.isEmpty()) {
-
                 exception = new Exception("No have primaryKey() ");
             }
 
+            /**
+             * carga los documentos embebidos
+             */
+            if (anotacionEmbedded != null) {
+                final Embedded anotacionPK = (Embedded) anotacionEmbedded;
+                EmbeddedBeans embeddedBeans = new EmbeddedBeans();
+                embeddedBeans.setName(variable.getName());
+                embeddedBeans.setType(variable.getType().getName());
+                embeddedBeansList.add(embeddedBeans);
+            }
+
         }
-//        for (PrimaryKey p : primaryKeyList) {
-//            System.out.println(" " + p.toString());
-//        }
+        for(EmbeddedBeans e:embeddedBeansList){
+            System.out.println("--> embebido "+e.toString());
+        }
+
     }
 
     public MongoDatabase getDB() {
@@ -608,13 +627,13 @@ public abstract class AbstractFacade<T> {
      * @return
      */
     public T findOneAndUpdate(Document doc, String field, Integer... incremento) {
-         try {
+        try {
             Integer increment = 1;
             if (incremento.length != 0) {
                 increment = incremento[0];
 
             }
-           
+
             Document inc = new Document("$inc", new Document(field, increment));
 
             FindOneAndUpdateOptions findOneAndUpdateOptions = new FindOneAndUpdateOptions();
@@ -649,18 +668,19 @@ public abstract class AbstractFacade<T> {
                 Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return list.get(0); 
+        return list.get(0);
     }
+
     /**
-     * 
+     *
      * @param doc
      * @param inc
      * @param incremento
-     * @return 
+     * @return
      */
     public T findOneAndUpdate(Document doc, Document inc, Integer... incremento) {
-         try {
-           
+        try {
+
             FindOneAndUpdateOptions findOneAndUpdateOptions = new FindOneAndUpdateOptions();
             findOneAndUpdateOptions.upsert(true);
 
@@ -693,15 +713,9 @@ public abstract class AbstractFacade<T> {
                 Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        return list.get(0); 
+        return list.get(0);
     }
-    
-   
 
-    
-    
-    
-    
     /**
      * ejecuta el finOneAndUpdate()
      *
@@ -710,8 +724,6 @@ public abstract class AbstractFacade<T> {
      * @param incremento
      * @return
      */
-    
-
     /**
      * search document String value
      *
@@ -863,13 +875,13 @@ public abstract class AbstractFacade<T> {
         }
         return list;
     }
-    
+
     /**
-     * 
+     *
      * @param key
      * @param value
      * @param docSort
-     * @return 
+     * @return
      */
     public List<T> findBy(String key, String value, Document... docSort) {
         Document sortQuery = new Document();
@@ -880,7 +892,7 @@ public abstract class AbstractFacade<T> {
             }
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
-Document doc = new Document(key, value);
+            Document doc = new Document(key, value);
             MongoDatabase db = getMongoClient().getDatabase(database);
             FindIterable<Document> iterable = db.getCollection(collection).find(doc).sort(sortQuery);
             iterable.forEach(new Block<Document>() {
@@ -901,13 +913,13 @@ Document doc = new Document(key, value);
         }
         return list;
     }
-    
+
     /**
-     * 
+     *
      * @param key
      * @param value
      * @param docSort
-     * @return 
+     * @return
      */
     public List<T> findBy(String key, Date value, Document... docSort) {
         Document sortQuery = new Document();
@@ -918,7 +930,7 @@ Document doc = new Document(key, value);
             }
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
-Document doc = new Document(key, value);
+            Document doc = new Document(key, value);
             MongoDatabase db = getMongoClient().getDatabase(database);
             FindIterable<Document> iterable = db.getCollection(collection).find(doc).sort(sortQuery);
             iterable.forEach(new Block<Document>() {
@@ -939,12 +951,13 @@ Document doc = new Document(key, value);
         }
         return list;
     }
+
     /**
-     * 
+     *
      * @param key
      * @param value
      * @param docSort
-     * @return 
+     * @return
      */
     public List<T> findBy(String key, Integer value, Document... docSort) {
         Document sortQuery = new Document();
@@ -955,7 +968,7 @@ Document doc = new Document(key, value);
             }
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
-Document doc = new Document(key, value);
+            Document doc = new Document(key, value);
             MongoDatabase db = getMongoClient().getDatabase(database);
             FindIterable<Document> iterable = db.getCollection(collection).find(doc).sort(sortQuery);
             iterable.forEach(new Block<Document>() {
@@ -976,6 +989,7 @@ Document doc = new Document(key, value);
         }
         return list;
     }
+
     public List<T> findBy(String key, Object value, Document... docSort) {
         Document sortQuery = new Document();
         try {
@@ -985,7 +999,7 @@ Document doc = new Document(key, value);
             }
             Object t = entityClass.newInstance();
             list = new ArrayList<>();
-Document doc = new Document(key, value);
+            Document doc = new Document(key, value);
             MongoDatabase db = getMongoClient().getDatabase(database);
             FindIterable<Document> iterable = db.getCollection(collection).find(doc).sort(sortQuery);
             iterable.forEach(new Block<Document>() {

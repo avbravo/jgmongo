@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jgmongo.anotaciones.Id;
 
-import com.jgmongo.anotaciones.PrimaryKey;
+import com.jgmongo.beans.PrimaryKey;
 import com.jgmongo.util.DateDeserializer;
 import com.jgmongo.util.Util;
 import com.mongodb.Block;

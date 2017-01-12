@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.jgmongo.anotaciones;
+package com.jgmongo.beans;
 
 import lombok.Getter;
 import lombok.Setter;
