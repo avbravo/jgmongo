@@ -6,6 +6,9 @@
 package com.jgmongo.services;
 
 import com.jgmongo.interfaces.ServicesInterfaces;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.bson.Document;
 
 /**
  *
@@ -40,6 +43,12 @@ public class GenericServices<T> implements ServicesInterfaces {
         T jsonToObject = getGson().fromJson(json, clazz);
         return jsonToObject;
     }
+    public <T> T fromJsontoPojo(Document doc, Class<T> clazz) {
+        T jsonToObject = getGson().fromJson(doc.toJson(), clazz);
+        return jsonToObject;
+    }
+    
+    
     /**
      * para objetos java que contienen un atributo Date
      * @param <T>

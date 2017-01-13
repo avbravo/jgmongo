@@ -31,9 +31,16 @@ public interface ServicesInterfaces<T> {
         return doc;
     }
 
-    default T toJava(Document doc, T t1) {
+    
+//    default T toJava(Document doc, T t1) {
+//
+//        T o = fromJsontoJava(doc.toJson(), (Class<T>) t1);
+//
+//        return o;
+//    }
+    default T toJava(Document doc, Class<T> clazz) {
 
-        T o = fromJsontoJava(doc.toJson(), (Class<T>) t1);
+        T o = fromJsontoJava(doc.toJson(), clazz);
 
         return o;
     }

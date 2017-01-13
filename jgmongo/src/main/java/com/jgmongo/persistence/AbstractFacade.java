@@ -214,9 +214,9 @@ public abstract class AbstractFacade<T> {
     private Document getIndexPrimaryKey() {
         Document doc = new Document();
         try {
-            for (PrimaryKey p : primaryKeyList) {
+            primaryKeyList.forEach((p) -> {
                 doc.put(util.letterToUpper(p.getName()), 1);
-            }
+            });
         } catch (Exception e) {
             Logger.getLogger(AbstractFacade.class.getName() + "docPrimaryKey()").log(Level.SEVERE, null, e);
             exception = new Exception("docPrimaryKey() ", e);
@@ -248,9 +248,10 @@ public abstract class AbstractFacade<T> {
      */
     public Boolean save(T t2) {
         try {
-
+            
             //verify primaryKey
 //            if (findById(t2) != null) {
+//             
 //                exception = new Exception("Please add the @Id annotation from package com.jgmongo.anotaciones.Id");
 //                return false;
 //            }
@@ -734,6 +735,40 @@ public abstract class AbstractFacade<T> {
      * @throws IllegalAccessException
      */
     public T find(String key, String value) {
+
+        try {
+            Object t = entityClass.newInstance();
+            MongoDatabase db = getMongoClient().getDatabase(database);
+            FindIterable<Document> iterable = db.getCollection(collection).find(new Document(key, value));
+            iterable.forEach(new Block<Document>() {
+                @Override
+                public void apply(final Document document) {
+
+                    Method method;
+                    try {
+
+                        method = entityClass.getDeclaredMethod("toPojo", Document.class);
+
+                        t1 = (T) method.invoke(t, document);
+
+                    } catch (Exception e) {
+                        Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
+                        exception = new Exception("find() ", e);
+
+                    }
+
+                }
+            });
+
+        } catch (Exception e) {
+            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
+            exception = new Exception("find() ", e);
+
+        }
+
+        return (T) t1;
+    }
+    public T find(String key, Object value) {
 
         try {
             Object t = entityClass.newInstance();
