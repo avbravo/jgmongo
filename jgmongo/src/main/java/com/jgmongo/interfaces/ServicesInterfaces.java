@@ -102,6 +102,7 @@ public interface ServicesInterfaces<T> {
         Gson gson = new GsonBuilder()
                 .setDateFormat("dd/MM/yyyy HH:mm:ss a")
                 .setPrettyPrinting()
+          
                 .create();
 
         return gson;
