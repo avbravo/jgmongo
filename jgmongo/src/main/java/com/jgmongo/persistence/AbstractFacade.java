@@ -62,6 +62,7 @@ public abstract class AbstractFacade<T> {
     List<EmbeddedBeans> embeddedBeansList = new ArrayList<>();
     Exception exception;
     Util util = new Util();
+     T t1;
 //
 //private Gson getGson() {
 //
@@ -105,7 +106,7 @@ public abstract class AbstractFacade<T> {
         this.exception = exception;
     }
 
-    T t1;
+   
 
     protected abstract MongoClient getMongoClient();
 
