@@ -736,40 +736,7 @@ public abstract class AbstractFacade<T> {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    public T find(String key, String value) {
-
-        try {
-            Object t = entityClass.newInstance();
-            MongoDatabase db = getMongoClient().getDatabase(database);
-            FindIterable<Document> iterable = db.getCollection(collection).find(new Document(key, value));
-            iterable.forEach(new Block<Document>() {
-                @Override
-                public void apply(final Document document) {
-
-                    Method method;
-                    try {
-
-                        method = entityClass.getDeclaredMethod("toPojo", Document.class);
-
-                        t1 = (T) method.invoke(t, document);
-
-                    } catch (Exception e) {
-                        Logger.getLogger(AbstractFacade.class.getName() + "find()").log(Level.SEVERE, null, e);
-                        exception = new Exception("find() ", e);
-
-                    }
-
-                }
-            });
-
-        } catch (Exception e) {
-            Logger.getLogger(AbstractFacade.class.getName()).log(Level.SEVERE, null, e);
-            exception = new Exception("find() ", e);
-
-        }
-
-        return (T) t1;
-    }
+   
     public T find(String key, Object value) {
 
         try {
